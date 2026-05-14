@@ -60,7 +60,7 @@ async function callAI(prompt) {
     try {
       const body = JSON.stringify({
         model: 'claude-haiku-4-5-20251001',
-        max_tokens: 1500,
+        max_tokens: 2500,
         messages: [{ role: 'user', content: prompt }]
       });
       const r = await fetchURL('https://api.anthropic.com/v1/messages', {
@@ -160,8 +160,8 @@ app.get('/leads', async (req, res) => {
     } catch(e) { console.log('[PLANNING] failed:', e.message); }
 
     const prompt = realData
-      ? 'You are a lead scoring AI for TradeFlow UK.\nTrade: ' + trade + '\nArea: ' + district + '\n' + (keywords?'Keywords: '+keywords+'\n':'') + '\nReal UK planning applications:\n' + apps.slice(0,20).map((a,i) => (i+1)+'. Ref:'+(a.reference||'N/A')+' | '+(a.address||a.name||'?')+' | '+(a.description||a.name||'Application')).join('\n') + '\n\nScore the relevant ones for a ' + trade + '. Skip commercial ones.\nReturn ONLY a JSON array, no markdown:\n[{"ref":"...","address":"...","summary":"2 sentences why a ' + trade + ' should contact","score":55-97,"type":"Rear extension|Loft conversion|New build|Renovation|Bathroom|Kitchen|Roof","timeframe":"Recently approved|Under consideration|ASAP","budget":"2k-5k|5k-15k|15k-40k|40k+|Not stated"}]'
-      : 'You are a lead generation AI for TradeFlow UK.\nTrade: ' + trade + '\nArea: ' + district + ' (' + area + ')\n' + (keywords?'Keywords: '+keywords+'\n':'') + '\nGenerate 8 realistic residential construction leads for a ' + trade + ' in ' + district + '. Use realistic UK addresses for ' + area + '.\nReturn ONLY a JSON array, no markdown:\n[{"ref":"N/A","address":"realistic UK address in ' + area + '","summary":"what work needed and why contact urgently","score":55-92,"type":"Rear extension|Loft conversion|New build|Renovation|Bathroom|Kitchen|Roof","timeframe":"ASAP|Recently approved|Under consideration|Within 3 months","budget":"2k-5k|5k-15k|15k-40k|40k+|Not stated"}]';
+      ? 'You are a lead scoring AI for TradeFlow UK.\nTrade: ' + trade + '\nArea: ' + district + '\n' + (keywords?'Keywords: '+keywords+'\n':'') + '\nReal UK planning applications:\n' + apps.slice(0,10).map((a,i) => (i+1)+'. Ref:'+(a.reference||'N/A')+' | '+(a.address||a.name||'?')+' | '+(a.description||a.name||'Application')).join('\n') + '\n\nPick the 5 most relevant for a ' + trade + '. Return ONLY a valid complete JSON array, no markdown, no extra text:\n[{"ref":"...","address":"...","summary":"why contact","score":55-97,"type":"Extension|Conversion|New build|Renovation","timeframe":"Approved|Pending|ASAP","budget":"2k-5k|5k-15k|15k-40k|40k+|Unknown"}]'
+      : 'You are a lead generation AI for TradeFlow UK.\nGenerate 5 residential construction leads for a ' + trade + ' in ' + district + ' (' + area + '). Use realistic UK addresses.\nReturn ONLY a valid complete JSON array, no markdown:\n[{"ref":"N/A","address":"UK address","summary":"work needed","score":60-90,"type":"Extension|Conversion|Renovation","timeframe":"ASAP|Soon|3 months","budget":"2k-5k|5k-15k|15k-40k|40k+|Unknown"}]';
 
     const raw   = await callAI(prompt);
     console.log('[AI RAW]', raw.substring(0, 200));
