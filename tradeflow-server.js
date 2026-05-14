@@ -148,7 +148,7 @@ app.get('/leads', async (req, res) => {
     console.log('[SEARCH]', area, '->', district, lat, lng, '| trade:', trade);
  
     const deg = parseFloat(radius) / 69.0;
-    const planningUrl = 'https://www.planning.data.gov.uk/entity.json?dataset=planning-application&entries=current&limit=50&field=reference&field=name&field=address&field=description&field=start-date&longitude__gte=' + (lng-deg).toFixed(6) + '&longitude__lte=' + (lng+deg).toFixed(6) + '&latitude__gte=' + (lat-deg).toFixed(6) + '&latitude__lte=' + (lat+deg).toFixed(6);
+    const planningUrl = 'https://www.planning.data.gov.uk/entity.json?dataset=planning-application&entries=current&limit=50&field=reference&field=name&field=address&field=site-address&field=street-address&field=description&field=start-date&longitude__gte=' + (lng-deg).toFixed(6) + '&longitude__lte=' + (lng+deg).toFixed(6) + '&latitude__gte=' + (lat-deg).toFixed(6) + '&latitude__lte=' + (lat+deg).toFixed(6);
  
     let apps = [], realData = false;
     try {
@@ -160,8 +160,13 @@ app.get('/leads', async (req, res) => {
     } catch(e) { console.log('[PLANNING] failed:', e.message); }
  
     const prompt = realData
-      ? 'You are a lead scoring AI for TradeFlow UK.\nTrade: ' + trade + '\nArea: ' + district + '\n' + (keywords?'Keywords: '+keywords+'\n':'') + '\nReal UK planning applications:\n' + apps.slice(0,10).map((a,i) => (i+1)+'. Ref:'+(a.reference||'N/A')+' | FullAddress:'+(a.address||a.name||'Not listed')+' | '+(a.description||a.name||'Application')).join('\n') + '\n\nPick the 5 most relevant for a ' + trade + '. IMPORTANT: Use the EXACT full address from the data above, do not replace it with just the city name.\nReturn ONLY a valid complete JSON array, no markdown, no extra text:\n[{"ref":"...","address":"EXACT full address from the data","summary":"why contact","score":55-97,"type":"Extension|Conversion|New build|Renovation","timeframe":"Approved|Pending|ASAP","budget":"2k-5k|5k-15k|15k-40k|40k+|Unknown"}]'
-      : 'You are a lead generation AI for TradeFlow UK.\nGenerate 5 residential construction leads for a ' + trade + ' in ' + district + ' (' + area + '). Use realistic full UK street addresses including house number and street name.\nReturn ONLY a valid complete JSON array, no markdown:\n[{"ref":"N/A","address":"full UK street address with number and street name","summary":"work needed","score":60-90,"type":"Extension|Conversion|Renovation","timeframe":"ASAP|Soon|3 months","budget":"2k-5k|5k-15k|15k-40k|40k+|Unknown"}]';
+      ? 'You are a lead scoring AI for TradeFlow UK.\nTrade: ' + trade + '\nArea: ' + district + '\n' + (keywords?'Keywords: '+keywords+'\n':'') + '\nReal UK planning applications:\n' + apps.slice(0,10).map((a,i) => {
+          const addr = a['site-address'] || a.address || a['street-address'] || a.name || 'Address not available';
+          const ref  = a.reference || 'N/A';
+          const desc = a.description || a.name || 'Planning application';
+          return (i+1)+'. Ref:'+ref+' | Address:'+addr+' | '+desc;
+        }).join('\n') + '\n\nPick the 5 most relevant for a ' + trade + '. IMPORTANT: Copy the EXACT address from above into the address field. Do not replace it with just the city name.\nReturn ONLY a valid complete JSON array, no markdown:\n[{"ref":"...","address":"EXACT address from data above","summary":"why contact","score":55-97,"type":"Extension|Conversion|New build|Renovation","timeframe":"Approved|Pending|ASAP","budget":"2k-5k|5k-15k|15k-40k|40k+|Unknown"}]'
+      : 'You are a lead generation AI for TradeFlow UK.\nGenerate 5 residential construction leads for a ' + trade + ' in ' + district + ' (' + area + '). Use realistic full UK street addresses with house number, street name and postcode.\nReturn ONLY a valid complete JSON array, no markdown:\n[{"ref":"N/A","address":"e.g. 42 Oak Street, Manchester, M14 5AB","summary":"work needed","score":60-90,"type":"Extension|Conversion|Renovation","timeframe":"ASAP|Soon|3 months","budget":"2k-5k|5k-15k|15k-40k|40k+|Unknown"}]';
  
     const raw   = await callAI(prompt);
     console.log('[AI RAW]', raw.substring(0, 200));
