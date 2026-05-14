@@ -1,0 +1,1370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TradeFlow — AI Leads for Contractors</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #F5F2EC;
+    --surface: #FFFEF9;
+    --surface2: #F0EDE6;
+    --border: rgba(60,55,40,0.12);
+    --border-strong: rgba(60,55,40,0.22);
+    --text: #1A1814;
+    --text-2: #6B6659;
+    --text-3: #9E9A8E;
+    --accent: #2D5016;
+    --accent-light: #4A7A28;
+    --accent-bg: #EDF5E0;
+    --accent-bg2: #D6EAB8;
+    --amber: #8B5E00;
+    --amber-bg: #FFF3D0;
+    --red: #8B1A1A;
+    --red-bg: #FFEBEB;
+    --radius: 10px;
+    --radius-lg: 16px;
+    --radius-xl: 24px;
+  }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    font-size: 15px;
+    line-height: 1.6;
+  }
+
+  h1, h2, h3, .serif { font-family: 'DM Serif Display', serif; }
+
+  .hidden { display: none !important; }
+
+  /* ── LANDING ── */
+  #page-landing {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .land-nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 40px;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+  }
+  .logo {
+    font-family: 'DM Serif Display', serif;
+    font-size: 22px;
+    color: var(--accent);
+    letter-spacing: -0.3px;
+  }
+  .logo span { color: var(--text); }
+  .nav-btns { display: flex; gap: 10px; }
+  .btn {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    padding: 9px 20px;
+    border-radius: var(--radius);
+    cursor: pointer;
+    border: 1px solid var(--border-strong);
+    background: transparent;
+    color: var(--text);
+    transition: background 0.15s, border-color 0.15s;
+  }
+  .btn:hover { background: var(--surface2); }
+  .btn-primary {
+    background: var(--accent);
+    color: #fff;
+    border-color: var(--accent);
+  }
+  .btn-primary:hover { background: var(--accent-light); border-color: var(--accent-light); }
+  .btn-lg { padding: 13px 28px; font-size: 15px; border-radius: 12px; }
+
+  .land-hero {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 80px 20px 60px;
+    background: var(--surface);
+  }
+  .hero-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--accent-bg);
+    color: var(--accent);
+    font-size: 13px;
+    font-weight: 500;
+    padding: 5px 14px;
+    border-radius: 99px;
+    margin-bottom: 28px;
+    border: 1px solid var(--accent-bg2);
+  }
+  .hero-pill::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: var(--accent-light); }
+  .land-hero h1 {
+    font-size: clamp(38px, 7vw, 68px);
+    line-height: 1.08;
+    letter-spacing: -1.5px;
+    max-width: 700px;
+    margin-bottom: 22px;
+  }
+  .land-hero h1 em { font-style: italic; color: var(--accent); }
+  .land-hero p {
+    font-size: 17px;
+    color: var(--text-2);
+    max-width: 480px;
+    margin-bottom: 36px;
+    line-height: 1.65;
+  }
+  .hero-cta { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
+
+  .land-features {
+    padding: 60px 40px;
+    background: var(--bg);
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 20px;
+    max-width: 1100px;
+    margin: 0 auto;
+    width: 100%;
+  }
+  .feat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 28px 24px;
+  }
+  .feat-icon {
+    width: 40px; height: 40px;
+    border-radius: 10px;
+    background: var(--accent-bg);
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 16px;
+    font-size: 18px;
+    color: var(--accent);
+  }
+  .feat-card h3 { font-family: 'DM Serif Display', serif; font-size: 18px; margin-bottom: 8px; }
+  .feat-card p { font-size: 14px; color: var(--text-2); line-height: 1.6; }
+
+  .land-pricing {
+    padding: 60px 40px;
+    background: var(--surface);
+    text-align: center;
+    border-top: 1px solid var(--border);
+  }
+  .land-pricing h2 { font-size: 36px; letter-spacing: -0.8px; margin-bottom: 8px; }
+  .land-pricing > p { color: var(--text-2); margin-bottom: 32px; font-size: 15px; }
+  .price-card {
+    display: inline-block;
+    background: var(--bg);
+    border: 2px solid var(--accent);
+    border-radius: var(--radius-xl);
+    padding: 36px 48px;
+    max-width: 380px;
+    text-align: center;
+    width: 100%;
+  }
+  .price-amount { font-family: 'DM Serif Display', serif; font-size: 56px; color: var(--accent); letter-spacing: -2px; }
+  .price-amount span { font-size: 22px; vertical-align: super; margin-right: 2px; }
+  .price-period { color: var(--text-2); font-size: 15px; margin-bottom: 24px; }
+  .price-perks { list-style: none; text-align: left; margin-bottom: 28px; }
+  .price-perks li { font-size: 14px; padding: 7px 0; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 10px; }
+  .price-perks li::before { content: '✓'; color: var(--accent-light); font-weight: 600; font-size: 13px; }
+
+  /* ── AUTH ── */
+  #page-auth {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg);
+    padding: 20px;
+  }
+  .auth-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-xl);
+    padding: 40px;
+    width: 100%;
+    max-width: 420px;
+  }
+  .auth-logo { font-family: 'DM Serif Display', serif; font-size: 26px; color: var(--accent); margin-bottom: 28px; }
+  .auth-card h2 { font-size: 26px; letter-spacing: -0.5px; margin-bottom: 6px; }
+  .auth-card > p { color: var(--text-2); font-size: 14px; margin-bottom: 28px; }
+  .field { margin-bottom: 16px; }
+  .field label { display: block; font-size: 13px; font-weight: 500; color: var(--text-2); margin-bottom: 6px; }
+  .field input, .field select {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    background: var(--bg);
+    color: var(--text);
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  .field input:focus, .field select:focus { border-color: var(--accent); }
+  .auth-switch { font-size: 13px; color: var(--text-2); text-align: center; margin-top: 20px; }
+  .auth-switch a { color: var(--accent); text-decoration: none; cursor: pointer; font-weight: 500; }
+  .auth-error { background: var(--red-bg); color: var(--red); font-size: 13px; padding: 10px 14px; border-radius: var(--radius); margin-bottom: 16px; }
+
+  /* ── PAYMENT ── */
+  #page-payment {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg);
+    padding: 20px;
+  }
+  .pay-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-xl);
+    padding: 40px;
+    width: 100%;
+    max-width: 440px;
+  }
+  .pay-card h2 { font-size: 26px; letter-spacing: -0.5px; margin-bottom: 6px; }
+  .pay-card > p { color: var(--text-2); font-size: 14px; margin-bottom: 24px; }
+  .pay-summary {
+    background: var(--accent-bg);
+    border: 1px solid var(--accent-bg2);
+    border-radius: var(--radius);
+    padding: 16px;
+    margin-bottom: 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .pay-summary .ps-name { font-weight: 500; font-size: 15px; }
+  .pay-summary .ps-price { font-family: 'DM Serif Display', serif; font-size: 22px; color: var(--accent); }
+  .card-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .secure-badge { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text-3); margin-top: 12px; justify-content: center; }
+  .demo-note { font-size: 12px; color: var(--text-3); text-align: center; margin-top: 16px; line-height: 1.5; }
+
+  /* ── DASHBOARD ── */
+  #page-dashboard { min-height: 100vh; display: flex; flex-direction: column; }
+  .dash-nav {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 28px;
+    height: 58px;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+  .dash-logo { font-family: 'DM Serif Display', serif; font-size: 20px; color: var(--accent); }
+  .dash-user { display: flex; align-items: center; gap: 12px; }
+  .avatar { width: 34px; height: 34px; border-radius: 50%; background: var(--accent-bg); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 600; color: var(--accent); }
+  .dash-body { flex: 1; display: flex; }
+  .sidebar {
+    width: 220px;
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    padding: 20px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .sidebar-label { font-size: 11px; font-weight: 500; color: var(--text-3); letter-spacing: .08em; text-transform: uppercase; padding: 8px 12px 4px; margin-top: 8px; }
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 12px;
+    border-radius: var(--radius);
+    font-size: 14px;
+    color: var(--text-2);
+    cursor: pointer;
+    transition: background 0.12s, color 0.12s;
+    font-weight: 400;
+  }
+  .nav-item:hover { background: var(--surface2); color: var(--text); }
+  .nav-item.active { background: var(--accent-bg); color: var(--accent); font-weight: 500; }
+  .nav-item svg { width: 16px; height: 16px; flex-shrink: 0; opacity: 0.75; }
+  .main { flex: 1; padding: 28px 32px; overflow-y: auto; }
+  .page-section { display: none; }
+  .page-section.active { display: block; }
+
+  /* Stats row */
+  .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 14px; margin-bottom: 28px; }
+  .stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 18px 20px; }
+  .stat-label { font-size: 12px; color: var(--text-3); font-weight: 500; margin-bottom: 6px; }
+  .stat-val { font-family: 'DM Serif Display', serif; font-size: 30px; letter-spacing: -0.8px; color: var(--text); }
+  .stat-sub { font-size: 12px; color: var(--text-3); margin-top: 2px; }
+
+  /* Lead search */
+  .search-bar {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+  }
+  .search-bar input, .search-bar select {
+    padding: 9px 14px;
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    background: var(--surface);
+    color: var(--text);
+    outline: none;
+  }
+  .search-bar input { flex: 1; min-width: 180px; }
+  .search-bar input:focus, .search-bar select:focus { border-color: var(--accent); }
+
+  /* Lead cards */
+  .leads-list { display: flex; flex-direction: column; gap: 12px; }
+  .lead-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 18px 20px;
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+    transition: border-color 0.15s;
+  }
+  .lead-card:hover { border-color: var(--border-strong); }
+  .lead-score {
+    width: 44px; height: 44px; border-radius: 10px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    font-size: 16px; font-weight: 700; flex-shrink: 0;
+    font-family: 'DM Serif Display', serif;
+  }
+  .score-high { background: var(--accent-bg); color: var(--accent); }
+  .score-med  { background: var(--amber-bg); color: var(--amber); }
+  .score-low  { background: var(--surface2); color: var(--text-3); }
+  .lead-main { flex: 1; }
+  .lead-name { font-weight: 500; font-size: 15px; margin-bottom: 3px; }
+  .lead-desc { font-size: 13px; color: var(--text-2); line-height: 1.55; margin-bottom: 8px; }
+  .lead-meta { display: flex; gap: 8px; flex-wrap: wrap; }
+  .tag {
+    font-size: 12px; padding: 3px 10px; border-radius: 99px; border: 1px solid;
+    display: inline-block;
+  }
+  .tag-green { background: var(--accent-bg); color: var(--accent); border-color: var(--accent-bg2); }
+  .tag-amber { background: var(--amber-bg); color: var(--amber); border-color: #F5DFA0; }
+  .tag-gray  { background: var(--surface2); color: var(--text-2); border-color: var(--border-strong); }
+  .lead-actions { display: flex; flex-direction: column; gap: 6px; align-items: flex-end; }
+  .lead-source { font-size: 11px; color: var(--text-3); margin-bottom: 4px; }
+
+  /* Loading skeleton */
+  .skeleton { background: var(--surface2); border-radius: 6px; animation: pulse 1.4s ease-in-out infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.5} }
+
+  /* Section headings */
+  .section-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+  .section-head h2 { font-size: 22px; letter-spacing: -0.4px; }
+  .section-head p { font-size: 13px; color: var(--text-2); margin-top: 2px; }
+
+  /* Settings */
+  .settings-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .settings-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 22px; }
+  .settings-card h3 { font-size: 15px; font-weight: 500; margin-bottom: 14px; }
+  .toggle-row { display: flex; align-items: center; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--border); }
+  .toggle-row:last-child { border-bottom: none; }
+  .toggle-row span { font-size: 13px; color: var(--text-2); }
+  .toggle { width: 36px; height: 20px; border-radius: 99px; background: var(--surface2); border: 1px solid var(--border-strong); position: relative; cursor: pointer; transition: background 0.2s; }
+  .toggle.on { background: var(--accent); border-color: var(--accent); }
+  .toggle::after { content:''; position:absolute; top:2px; left:2px; width:14px; height:14px; border-radius:50%; background:#fff; transition:transform 0.2s; }
+  .toggle.on::after { transform: translateX(16px); }
+
+  /* Billing */
+  .billing-banner {
+    background: var(--accent-bg);
+    border: 1px solid var(--accent-bg2);
+    border-radius: var(--radius-lg);
+    padding: 20px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+  }
+  .billing-banner h3 { font-size: 16px; margin-bottom: 2px; }
+  .billing-banner p { font-size: 13px; color: var(--accent); }
+
+  /* AI indicator */
+  .ai-badge {
+    display: inline-flex; align-items: center; gap: 5px;
+    background: var(--accent-bg); color: var(--accent);
+    font-size: 11px; font-weight: 500; padding: 3px 10px; border-radius: 99px;
+    border: 1px solid var(--accent-bg2);
+  }
+  .ai-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent-light); animation: blink 2s ease-in-out infinite; }
+  @keyframes blink { 0%,100%{opacity:1}50%{opacity:0.3} }
+
+  @media (max-width: 700px) {
+    .sidebar { display: none; }
+    .land-nav { padding: 16px 20px; }
+    .land-features { padding: 40px 20px; }
+    .land-pricing { padding: 40px 20px; }
+    .settings-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ════════════ LANDING PAGE ════════════ -->
+<div id="page-landing">
+  <nav class="land-nav">
+    <div class="logo">Trade<span>Flow</span></div>
+    <div class="nav-btns">
+      <button class="btn" id="nav-login-btn" onclick="showAuth('login')">Sign in</button>
+      <button class="btn btn-primary" id="nav-signup-btn" onclick="showAuth('signup')">Start free trial</button>
+    </div>
+  </nav>
+
+  <section class="land-hero">
+    <div class="hero-pill">AI-powered lead generation</div>
+    <h1>Get renovation leads <em>before</em> your competition</h1>
+    <p>TradeFlow searches the web in real time — permit filings, local groups, job boards — and delivers scored, ready-to-contact homeowner leads straight to your inbox.</p>
+    <div class="hero-cta">
+      <button class="btn btn-primary btn-lg" id="hero-signup-btn" onclick="showAuth('signup')">Start free 7-day trial</button>
+      <button class="btn btn-lg" id="hero-pricing-btn" onclick="document.getElementById('pricing').scrollIntoView({behavior:'smooth'})">See pricing</button>
+    </div>
+  </section>
+
+  <section class="land-features">
+    <div class="feat-card">
+      <div class="feat-icon">🔍</div>
+      <h3>Live web search</h3>
+      <p>Scans permit databases, Facebook groups, Nextdoor, Reddit, and Houzz for homeowners actively looking for help.</p>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon">⚡</div>
+      <h3>AI intent scoring</h3>
+      <p>Every lead is ranked 1–100 for purchase intent. You spend time on people who are ready to hire, not just browsing.</p>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon">📍</div>
+      <h3>Your area, your trade</h3>
+      <p>Filter by postcode radius and trade type. A plumber in Manchester only sees plumbing leads in Manchester.</p>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon">📬</div>
+      <h3>Daily digest</h3>
+      <p>Fresh leads delivered every morning by email. No dashboard to remember. Just opportunities in your inbox.</p>
+    </div>
+  </section>
+
+  <section class="land-pricing" id="pricing">
+    <h2>Simple pricing</h2>
+    <p>7-day free trial then £19.99/month. Cancel anytime.</p>
+    <div class="price-card">
+      <div class="price-amount"><span>£</span>19.99</div>
+      <div class="price-period">per month · 7-day free trial</div>
+      <ul class="price-perks">
+        <li>Unlimited AI lead searches</li>
+        <li>Real UK planning portal data</li>
+        <li>Location &amp; trade filtering</li>
+        <li>Skip trace tools on every lead</li>
+        <li>Copy letter feature</li>
+        <li>7-day free trial — cancel anytime</li>
+      </ul>
+      <button class="btn btn-primary btn-lg" id="pricing-signup-btn" style="width:100%" onclick="showAuth('signup')">Start free 7-day trial</button>
+    </div>
+  </section>
+</div>
+
+<!-- ════════════ AUTH PAGE ════════════ -->
+<div id="page-auth" style="display:none;min-height:100vh;align-items:center;justify-content:center;background:var(--bg);padding:20px;">
+  <div class="auth-card">
+    <div class="auth-logo">TradeFlow</div>
+    <div id="auth-error" class="auth-error" style="display:none;"></div>
+
+    <!-- Sign up form -->
+    <div id="form-signup">
+      <h2>Create your account</h2>
+      <p>7-day free trial, then £19.99/month</p>
+      <div class="field"><label>Full name</label><input type="text" id="su-name" placeholder="Joe Smith"></div>
+      <div class="field"><label>Email</label><input type="email" id="su-email" placeholder="joe@example.com"></div>
+      <div class="field"><label>Password</label><input type="password" id="su-pass" placeholder="Min. 8 characters"></div>
+      <div class="field">
+        <label>Trade</label>
+        <select id="su-trade">
+          <option value="">Select your trade</option>
+          <option>General contractor</option>
+          <option>Plumber</option>
+          <option>Electrician</option>
+          <option>Roofer</option>
+          <option>Kitchen &amp; bathroom fitter</option>
+          <option>Plasterer</option>
+          <option>Builder</option>
+          <option>Other</option>
+        </select>
+      </div>
+      <div class="field"><label>Postcode (for local leads)</label><input type="text" id="su-postcode" placeholder="e.g. M1 or SW1A"></div>
+      <button class="btn btn-primary" style="width:100%;margin-top:4px" onclick="doSignup()">Create account &amp; continue</button>
+      <p class="auth-switch">Already have an account? <a onclick="showAuth('login')">Sign in</a></p>
+    </div>
+
+    <!-- Login form -->
+    <div id="form-login" style="display:none;">
+      <h2>Welcome back</h2>
+      <p>Sign in to your TradeFlow account</p>
+      <div class="field"><label>Email</label><input type="email" id="li-email" placeholder="joe@example.com"></div>
+      <div class="field"><label>Password</label><input type="password" id="li-pass" placeholder="Your password"></div>
+      <button class="btn btn-primary" style="width:100%;margin-top:4px" onclick="doLogin()">Sign in</button>
+      <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--border);text-align:center;">
+        <p style="font-size:13px;color:var(--text-2);margin-bottom:10px;">Just completed payment? Click below to access your account:</p>
+        <button class="btn" style="width:100%;background:var(--accent-bg);color:var(--accent);border-color:var(--accent-bg2);font-weight:500;" onclick="doLogin()">✅ I've paid — take me to the app</button>
+      </div>
+      <p class="auth-switch">No account? <a onclick="showAuth('signup')">Start free trial</a></p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════ PAYMENT PAGE ════════════ -->
+<div id="page-payment" style="display:none;min-height:100vh;align-items:center;justify-content:center;background:var(--bg);padding:20px;">
+  <div class="pay-card">
+    <div class="auth-logo">TradeFlow</div>
+    <h2>Start your trial</h2>
+    <p>You won't be charged until your 7-day free trial ends.</p>
+    <div class="pay-summary">
+      <div>
+        <div class="ps-name">TradeFlow Pro</div>
+        <div style="font-size:13px;color:var(--accent)">Billed monthly after trial</div>
+      </div>
+      <div class="ps-price">£12/mo</div>
+    </div>
+    <div class="field"><label>Name on card</label><input type="text" id="card-name" placeholder="Joe Smith"></div>
+    <div class="field"><label>Card number</label><input type="text" id="card-num" placeholder="1234 5678 9012 3456" maxlength="19" oninput="fmtCard(this)"></div>
+    <div class="card-row">
+      <div class="field"><label>Expiry</label><input type="text" placeholder="MM / YY" maxlength="7" oninput="fmtExpiry(this)"></div>
+      <div class="field"><label>CVC</label><input type="text" placeholder="123" maxlength="3"></div>
+    </div>
+    <button class="btn btn-primary" style="width:100%;margin-top:8px" onclick="doPayment()">Start free trial</button>
+    <div class="secure-badge">🔒 Secured by 256-bit SSL encryption</div>
+    <p class="demo-note">This is a demo — no real payment is taken. Click the button to enter the app.</p>
+  </div>
+</div>
+
+<!-- ════════════ DASHBOARD ════════════ -->
+<div id="page-dashboard" style="display:none;min-height:100vh;flex-direction:column;">
+  <nav class="dash-nav">
+    <div class="dash-logo">TradeFlow</div>
+    <div class="dash-user">
+      <span class="ai-badge"><span class="ai-dot"></span>AI active</span>
+      <div id="dash-avatar" class="avatar">JS</div>
+      <span id="dash-username" style="font-size:14px;color:var(--text-2)">Joe Smith</span>
+      <button class="btn" style="padding:6px 14px;font-size:13px" onclick="logout()">Sign out</button>
+    </div>
+  </nav>
+  <div class="dash-body">
+    <aside class="sidebar">
+      <div class="nav-item active" onclick="setSection('leads',this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+        Find leads
+      </div>
+      <div class="nav-item" onclick="setSection('saved',this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+        Saved leads
+      </div>
+      <div class="nav-item" onclick="setSection('settings',this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        Settings
+      </div>
+      <div class="nav-item" onclick="setSection('billing',this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+        Billing
+      </div>
+    </aside>
+
+    <main class="main">
+      <!-- LEADS SECTION -->
+      <div id="sec-leads" class="page-section active">
+        <div class="section-head">
+          <div>
+            <h2>Find leads</h2>
+            <p id="leads-subtitle">AI is searching live sources for your area</p>
+          </div>
+          <button class="btn btn-primary" onclick="runSearch()">🔍 New search</button>
+        </div>
+
+        <div class="stats-grid">
+          <div class="stat-card"><div class="stat-label">Leads this week</div><div class="stat-val" id="stat-week">0</div><div class="stat-sub">+0 from last week</div></div>
+          <div class="stat-card"><div class="stat-label">Avg. intent score</div><div class="stat-val" id="stat-score">—</div><div class="stat-sub">out of 100</div></div>
+          <div class="stat-card"><div class="stat-label">Saved</div><div class="stat-val" id="stat-saved">0</div><div class="stat-sub">in your pipeline</div></div>
+          <div class="stat-card"><div class="stat-label">Last refreshed</div><div class="stat-val" id="stat-time" style="font-size:18px;">—</div><div class="stat-sub" id="stat-time-sub">not yet searched</div></div>
+        </div>
+
+        <div class="search-bar" style="flex-direction:column;gap:12px;">
+          <!-- Row 1: Area + Trade + Radius -->
+          <div style="display:flex;gap:10px;flex-wrap:wrap;width:100%;">
+            <input type="text" id="search-area" placeholder="📍 Search any UK town, city or postcode — e.g. Manchester, SW1A, Leeds…" style="flex:2;min-width:220px;">
+            <select id="search-trade" style="flex:1;min-width:160px;">
+              <option value="">🔨 All trades</option>
+              <option>General contractor</option>
+              <option>Plumber</option>
+              <option>Electrician</option>
+              <option>Roofer</option>
+              <option>Kitchen &amp; bathroom fitter</option>
+              <option>Plasterer</option>
+              <option>Builder</option>
+              <option>Painter &amp; decorator</option>
+              <option>Carpenter</option>
+              <option>Landscaper</option>
+            </select>
+            <select id="search-radius" style="min-width:120px;">
+              <option>5 miles</option><option selected>10 miles</option><option>25 miles</option><option>50 miles</option>
+            </select>
+          </div>
+          <!-- Row 2: Keywords + buttons -->
+          <div style="display:flex;gap:10px;flex-wrap:wrap;width:100%;align-items:center;">
+            <input type="text" id="search-kw" placeholder="Keywords (optional) — e.g. 'loft conversion', 'boiler'" style="flex:2;min-width:180px;">
+            <button class="btn btn-primary" onclick="runSearch()" style="white-space:nowrap;">🔍 Find leads</button>
+            <button class="btn" onclick="runUKWideSearch()" style="white-space:nowrap;background:var(--accent-bg);color:var(--accent);border-color:var(--accent-bg2);font-weight:500;">🇬🇧 Search all UK</button>
+          </div>
+          <!-- Quick city buttons -->
+          <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+            <span style="font-size:12px;color:var(--text-3);">Quick search:</span>
+            <button class="btn" onclick="quickSearch('London')"      style="padding:4px 12px;font-size:12px;">London</button>
+            <button class="btn" onclick="quickSearch('Manchester')"  style="padding:4px 12px;font-size:12px;">Manchester</button>
+            <button class="btn" onclick="quickSearch('Birmingham')"  style="padding:4px 12px;font-size:12px;">Birmingham</button>
+            <button class="btn" onclick="quickSearch('Leeds')"       style="padding:4px 12px;font-size:12px;">Leeds</button>
+            <button class="btn" onclick="quickSearch('Bristol')"     style="padding:4px 12px;font-size:12px;">Bristol</button>
+            <button class="btn" onclick="quickSearch('Glasgow')"     style="padding:4px 12px;font-size:12px;">Glasgow</button>
+            <button class="btn" onclick="quickSearch('Liverpool')"   style="padding:4px 12px;font-size:12px;">Liverpool</button>
+            <button class="btn" onclick="quickSearch('Sheffield')"   style="padding:4px 12px;font-size:12px;">Sheffield</button>
+            <button class="btn" onclick="quickSearch('Edinburgh')"   style="padding:4px 12px;font-size:12px;">Edinburgh</button>
+            <button class="btn" onclick="quickSearch('Nottingham')"  style="padding:4px 12px;font-size:12px;">Nottingham</button>
+          </div>
+          <div style="font-size:12px;color:var(--text-3);">
+            <a href="https://www.planningportal.co.uk" target="_blank" style="color:var(--accent);text-decoration:none;font-weight:500;">Browse planning portal manually →</a>
+          </div>
+        </div>
+
+        <div id="leads-container" class="leads-list">
+          <div style="text-align:center;padding:60px 20px;color:var(--text-3)">
+            <div style="font-size:32px;margin-bottom:12px">🔍</div>
+            <div style="font-size:15px;font-weight:500;color:var(--text-2);margin-bottom:6px">Ready to find leads</div>
+            <div style="font-size:13px">Click "New search" to scan live sources for homeowners near you.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SAVED SECTION -->
+      <div id="sec-saved" class="page-section">
+        <div class="section-head"><div><h2>Saved leads</h2><p>Your pipeline of promising contacts</p></div></div>
+        <div id="saved-container" class="leads-list">
+          <div style="text-align:center;padding:60px 20px;color:var(--text-3)">
+            <div style="font-size:32px;margin-bottom:12px">📌</div>
+            <div style="font-size:15px;font-weight:500;color:var(--text-2);margin-bottom:6px">No saved leads yet</div>
+            <div style="font-size:13px">Save leads from your search results to track them here.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SETTINGS SECTION -->
+      <div id="sec-settings" class="page-section">
+        <div class="section-head"><div><h2>Settings</h2><p>Manage your preferences and notifications</p></div></div>
+        <div class="settings-grid">
+          <div class="settings-card">
+            <h3>Notifications</h3>
+            <div class="toggle-row"><span>Daily lead digest email</span><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
+            <div class="toggle-row"><span>High-score lead alerts</span><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
+            <div class="toggle-row"><span>Weekly summary report</span><div class="toggle" onclick="this.classList.toggle('on')"></div></div>
+            <div class="toggle-row"><span>New source added</span><div class="toggle" onclick="this.classList.toggle('on')"></div></div>
+          </div>
+          <div class="settings-card">
+            <h3>Search preferences</h3>
+            <div class="field"><label>Default postcode area</label><input type="text" id="pref-postcode" placeholder="e.g. M1"></div>
+            <div class="field"><label>Default trade</label>
+              <select id="pref-trade">
+                <option>General contractor</option><option>Plumber</option><option>Electrician</option><option>Roofer</option><option>Kitchen &amp; bathroom fitter</option><option>Builder</option>
+              </select>
+            </div>
+            <div class="field"><label>Min. intent score to show</label>
+              <select><option>Show all (0+)</option><option selected>Good leads (40+)</option><option>Strong leads (70+)</option></select>
+            </div>
+            <button class="btn btn-primary" style="width:100%" onclick="alert('Preferences saved!')">Save preferences</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- BILLING SECTION -->
+      <div id="sec-billing" class="page-section">
+        <div class="section-head"><div><h2>Billing</h2><p>Manage your subscription</p></div></div>
+        <div class="billing-banner">
+          <div>
+            <h3>TradeFlow — Free plan</h3>
+            <p style="color:var(--accent)">Full access, no charge</p>
+          </div>
+          <div style="font-family:'DM Serif Display',serif;font-size:28px;color:var(--accent)">Free</div>
+        </div>
+        <div class="settings-grid">
+          <div class="settings-card">
+            <h3>Current plan</h3>
+            <div class="toggle-row"><span>Plan</span><span style="font-weight:500">TradeFlow Free</span></div>
+            <div class="toggle-row"><span>Price</span><span style="font-weight:500">£0 / month</span></div>
+            <div class="toggle-row"><span>Status</span><span class="tag tag-green">Active</span></div>
+            
+          </div>
+          <div class="settings-card">
+            <h3>Payment method</h3>
+            <div class="toggle-row"><span>Card</span><span style="font-weight:500">•••• •••• •••• <span id="card-last4">4242</span></span></div>
+            <div class="toggle-row"><span>Expiry</span><span style="font-weight:500">12 / 26</span></div>
+            <button class="btn" style="width:100%;margin-top:16px" onclick="alert('Card update coming soon')">Update card</button>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<script>
+const USERS_KEY = 'tf_users';
+const SESSION_KEY = 'tf_session';
+
+function getUsers() { return JSON.parse(localStorage.getItem(USERS_KEY) || '{}'); }
+function saveUsers(u) { localStorage.setItem(USERS_KEY, JSON.stringify(u)); }
+function getSession() { return JSON.parse(localStorage.getItem(SESSION_KEY) || 'null'); }
+function saveSession(s) { localStorage.setItem(SESSION_KEY, JSON.stringify(s)); }
+function clearSession() { localStorage.removeItem(SESSION_KEY); }
+
+function showPage(id) {
+  var displays = {
+    'page-landing':   'flex',
+    'page-auth':      'flex',
+    'page-payment':   'flex',
+    'page-dashboard': 'flex'
+  };
+  Object.keys(displays).forEach(function(p) {
+    var el = document.getElementById(p);
+    if (el) el.style.display = (p === id) ? displays[p] : 'none';
+  });
+}
+
+function showAuth(mode) {
+  var authPage = document.getElementById('page-auth');
+  var landPage = document.getElementById('page-landing');
+  if (landPage) landPage.style.cssText = 'display:none;';
+  if (authPage) {
+    authPage.style.cssText = 'display:flex !important;min-height:100vh;align-items:center;justify-content:center;background:var(--bg);padding:20px;flex-direction:column;';
+  }
+  var signup = document.getElementById('form-signup');
+  var login  = document.getElementById('form-login');
+  if (signup) signup.style.display = mode === 'signup' ? 'block' : 'none';
+  if (login)  login.style.display  = mode === 'login'  ? 'block' : 'none';
+  var err = document.getElementById('auth-error');
+  if (err) err.style.display = 'none';
+}
+
+function showAuthError(msg) {
+  const el = document.getElementById('auth-error');
+  if (el) { el.textContent = msg; el.style.display = 'block'; }
+}
+
+function doSignup() {
+  const name = document.getElementById('su-name').value.trim();
+  const email = document.getElementById('su-email').value.trim();
+  const pass = document.getElementById('su-pass').value;
+  const trade = document.getElementById('su-trade').value;
+  const postcode = document.getElementById('su-postcode').value.trim();
+  if (!name || !email || !pass || !trade || !postcode) return showAuthError('Please fill in all fields.');
+  if (pass.length < 8) return showAuthError('Password must be at least 8 characters.');
+  const users = getUsers();
+  if (users[email]) return showAuthError('An account with this email already exists.');
+  users[email] = { name, email, pass, trade, postcode, trialEnd: Date.now() + 7*86400000, paid: false };
+  saveUsers(users);
+  saveSession({ email });
+  // Redirect to Stripe payment
+  window.location.href = 'https://buy.stripe.com/dRmaEX8dI00ffZLbkG1VK00?prefilled_email=' + encodeURIComponent(email);
+}
+
+function doLogin() {
+  const email = document.getElementById('li-email').value.trim();
+  const pass = document.getElementById('li-pass').value;
+  const users = getUsers();
+  if (!users[email] || users[email].pass !== pass) return showAuthError('Incorrect email or password.');
+  saveSession({ email });
+  enterDashboard(users[email]);
+}
+
+function demoLogin() {
+  const users = getUsers();
+  const demoEmail = 'demo@tradeflow.ai';
+  if (!users[demoEmail]) {
+    users[demoEmail] = { name: 'Demo User', email: demoEmail, pass: 'demo1234', trade: 'General contractor', postcode: 'M1', trialEnd: Date.now() + 7*86400000 };
+    saveUsers(users);
+  }
+  saveSession({ email: demoEmail });
+  enterDashboard(users[demoEmail]);
+}
+
+function fmtCard(el) {
+  let v = el.value.replace(/\D/g,'').substring(0,16);
+  el.value = v.replace(/(.{4})/g,'$1 ').trim();
+}
+function fmtExpiry(el) {
+  let v = el.value.replace(/\D/g,'');
+  if (v.length >= 2) v = v.substring(0,2) + ' / ' + v.substring(2,4);
+  el.value = v;
+}
+
+function doPayment() {
+  const session = getSession();
+  if (!session) return;
+  const users = getUsers();
+  const user = users[session.email];
+  const num = document.getElementById('card-num').value.replace(/\D/g,'');
+  if (num.length < 12) { alert('Please enter a valid card number.'); return; }
+  user.paid = true;
+  saveUsers(users);
+  enterDashboard(user);
+}
+
+function enterDashboard(user) {
+  showPage('page-dashboard');
+  const initials = user.name.split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase();
+  document.getElementById('dash-avatar').textContent = initials;
+  document.getElementById('dash-username').textContent = user.name;
+  document.getElementById('pref-postcode').value = user.postcode || '';
+  const trialDays = Math.max(0, Math.ceil((user.trialEnd - Date.now()) / 86400000));
+  document.getElementById('billing-trial-note').textContent = trialDays > 0 ? `Free trial — ${trialDays} day${trialDays!==1?'s':''} remaining` : 'Paid subscription — active';
+  const renewal = new Date(Date.now() + 30*86400000);
+  document.getElementById('renewal-date').textContent = renewal.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});
+}
+
+function logout() {
+  clearSession();
+  showPage('page-landing');
+}
+
+function setSection(id, el) {
+  document.querySelectorAll('.page-section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('sec-'+id).classList.add('active');
+  el.classList.add('active');
+}
+
+let savedLeads = [];
+let savedCount = 0;
+
+let searchActive = false;
+
+function setStatus(msg) {
+  const el = document.getElementById('leads-subtitle');
+  if (el) el.textContent = msg;
+}
+
+function showSearchError(container, msg) {
+  container.innerHTML = '<div style="text-align:center;padding:40px 20px;color:var(--text-3)"><div style="font-size:36px;margin-bottom:12px">⚠️</div><div style="font-size:15px;font-weight:500;color:var(--text-2);margin-bottom:8px">No leads found</div><div style="font-size:13px;max-width:320px;margin:0 auto">' + msg + '</div></div>';
+}
+
+function addLog(log, icon, msg) {
+  const row = document.createElement('div');
+  row.style.cssText = 'display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--border);font-size:13px;color:var(--text-2);';
+  row.innerHTML = '<span>' + icon + '</span><span>' + msg + '</span>';
+  log.appendChild(row);
+  return row;
+}
+function updateLog(row, icon, msg) {
+  row.innerHTML = '<span>' + icon + '</span><span>' + msg + '</span>';
+}
+
+function quickSearch(city) {
+  document.getElementById('search-area').value = city;
+  runSearch();
+}
+
+const UK_CITIES = [
+  'London', 'Manchester', 'Birmingham', 'Leeds', 'Bristol',
+  'Glasgow', 'Liverpool', 'Sheffield', 'Edinburgh', 'Nottingham',
+  'Cardiff', 'Leicester', 'Newcastle', 'Brighton', 'Southampton'
+];
+
+async function runUKWideSearch() {
+  if (searchActive) return;
+  const session = getSession();
+  const users   = getUsers();
+  const user    = session ? users[session.email] : null;
+  const trade   = document.getElementById('search-trade').value || (user && user.trade) || 'General contractor';
+  const kw      = document.getElementById('search-kw').value.trim();
+  const container = document.getElementById('leads-container');
+  const btn     = document.querySelector('#sec-leads .btn-primary');
+
+  searchActive = true;
+  if (btn) { btn.textContent = '⏳ Searching…'; btn.disabled = true; }
+
+  container.innerHTML = '<div id="live-status-card" style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:24px 20px;"><div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;"><div style="width:10px;height:10px;flex-shrink:0;border-radius:50%;background:var(--accent-light);animation:blink 2s ease-in-out infinite;"></div><div style="font-weight:500;font-size:15px;">Searching across the UK for ' + escHtml(trade) + ' leads…</div></div><div id="live-log" style="display:flex;flex-direction:column;gap:2px;"></div></div>';
+  const log = document.getElementById('live-log');
+  setStatus('Searching UK-wide for ' + trade + ' leads…');
+
+  const shuffled = [...UK_CITIES].sort(() => 0.5 - Math.random()).slice(0, 5);
+  const allLeads = [];
+
+  for (const city of shuffled) {
+    const row = addLog(log, '🔍', 'Searching ' + city + '…');
+    try {
+      const res = await fetch(
+        'https://trade-flow-production-6fd8.up.railway.app/leads?area=' + encodeURIComponent(city) +
+        '&radius=10&trade=' + encodeURIComponent(trade) +
+        (kw ? '&keywords=' + encodeURIComponent(kw) : '')
+      );
+      if (res.ok) {
+        const data  = await res.json();
+        const leads = (data.leads || []).slice(0, 3);
+        leads.forEach(l => { l._city = city; l._real = data.real_data; });
+        allLeads.push(...leads);
+        updateLog(row, '✅', city + ' — ' + leads.length + ' leads' + (data.real_data ? ' 🟢' : ' 🤖'));
+      } else {
+        updateLog(row, '⚠️', city + ' — no results');
+      }
+    } catch(e) {
+      updateLog(row, '⚠️', city + ' — server unreachable');
+    }
+  }
+
+  if (!allLeads.length) {
+    if (document.getElementById('live-status-card')) document.getElementById('live-status-card').remove();
+    showSearchError(container, 'No leads found across the UK. Check your internet and try again.');
+    setStatus('No leads found');
+    searchActive = false;
+    if (btn) { btn.textContent = '🔍 New search'; btn.disabled = false; }
+    return;
+  }
+
+  allLeads.sort((a, b) => b.score - a.score);
+  addLog(log, '⚡', 'Found ' + allLeads.length + ' leads across ' + shuffled.length + ' cities — loading…');
+  await new Promise(r => setTimeout(r, 400));
+  if (document.getElementById('live-status-card')) document.getElementById('live-status-card').remove();
+  container.innerHTML = '';
+
+  currentLeadPool = allLeads.map(l => ({
+    name: l.type || 'Planning application', summary: l.summary, score: l.score,
+    location: l.address + (l._city ? ' (' + l._city + ')' : ''),
+    source: l._real ? 'UK Planning Portal' : 'AI generated',
+    budget: l.budget || 'Not stated', timeframe: l.timeframe, contact: '', ref: l.ref || 'N/A'
+  }));
+
+  for (let i = 0; i < currentLeadPool.length; i++) {
+    const lead = currentLeadPool[i];
+    const scoreClass = lead.score >= 75 ? 'score-high' : lead.score >= 50 ? 'score-med' : 'score-low';
+    const isSaved = savedLeads.some(s => s.location === lead.location);
+    const div = document.createElement('div');
+    div.className = 'lead-card';
+    div.style.cssText = 'opacity:0;transform:translateY(8px);transition:opacity 0.25s ease,transform 0.25s ease;';
+    div.innerHTML =
+      '<div class="lead-score ' + scoreClass + '">' + lead.score + '<div style="font-size:9px;font-family:\'DM Sans\',sans-serif;font-weight:500;opacity:0.7">score</div></div>' +
+      '<div class="lead-main">' +
+        '<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;"><div class="lead-name">' + escHtml(lead.name) + '</div>' +
+        '<span class="tag ' + (lead.source === 'UK Planning Portal' ? 'tag-green' : 'tag-amber') + '" style="font-size:11px;">' + (lead.source === 'UK Planning Portal' ? '🟢 Real data' : '🤖 AI estimate') + '</span></div>' +
+        '<div class="lead-desc">' + escHtml(lead.summary) + '</div>' +
+        '<div class="lead-meta" style="margin-top:8px;">' +
+          '<span class="tag tag-gray">📍 ' + escHtml(lead.location) + '</span>' +
+          '<span class="tag ' + (lead.timeframe === 'ASAP' || lead.timeframe.toLowerCase().includes('approv') ? 'tag-green' : 'tag-amber') + '">⏱ ' + escHtml(lead.timeframe) + '</span>' +
+          '<span class="tag tag-gray">💰 ' + escHtml(lead.budget) + '</span>' +
+        '</div>' +
+        '<div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--border);font-size:12px;color:var(--text-3);">📋 <strong style="color:var(--text-2)">How to contact:</strong> Find full address then skip trace the owner</div>' +
+        '<div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap;">' +
+          '<a href="https://www.google.com/search?q=' + encodeURIComponent((lead.ref || '') + ' planning application address') + '" target="_blank" style="text-decoration:none;"><button class="btn" style="padding:5px 10px;font-size:12px;background:var(--accent-bg);color:var(--accent);border-color:var(--accent-bg2);">🔍 Find full address</button></a>' +
+          '<a href="https://www.192.com/atoz/people/?q=' + encodeURIComponent(lead.location) + '" target="_blank" style="text-decoration:none;"><button class="btn" style="padding:5px 10px;font-size:12px;">📞 Skip trace on 192.com</button></a>' +
+          '<a href="https://search2.landregistry.gov.uk/search/house-prices-paid#/?q=' + encodeURIComponent(lead.location) + '" target="_blank" style="text-decoration:none;"><button class="btn" style="padding:5px 10px;font-size:12px;">🏠 Land Registry</button></a>' +
+          '<a href="https://www.facebook.com/search/people/?q=' + encodeURIComponent(lead.location) + '" target="_blank" style="text-decoration:none;"><button class="btn" style="padding:5px 10px;font-size:12px;">👤 Facebook search</button></a>' +
+        '</div>' +
+      '</div>' +
+      '<div class="lead-actions">' +
+        '<button class="btn btn-primary" style="padding:7px 14px;font-size:13px;" data-letter-idx="' + i + '" onclick="copyLetter(this)">📋 Copy letter</button>' +
+        '<button class="btn save-btn" style="padding:7px 14px;font-size:13px;' + (isSaved ? 'background:var(--accent-bg);color:var(--accent)' : '') + '" data-save-idx="' + i + '" onclick="saveLeadByIdx(this)">' + (isSaved ? 'Saved ✓' : 'Save') + '</button>' +
+      '</div>';
+    container.appendChild(div);
+    await new Promise(r => setTimeout(r, 60));
+    div.style.opacity = '1';
+    div.style.transform = 'translateY(0)';
+  }
+
+  const scores = currentLeadPool.map(l => l.score);
+  document.getElementById('stat-week').textContent = currentLeadPool.length;
+  document.getElementById('stat-score').textContent = Math.round(scores.reduce((a,b)=>a+b,0)/scores.length);
+  const now = new Date();
+  document.getElementById('stat-time').textContent = now.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
+  document.getElementById('stat-time-sub').textContent = 'UK-wide search';
+  setStatus(currentLeadPool.length + ' leads across UK · ' + shuffled.join(', '));
+  searchActive = false;
+  if (btn) { btn.textContent = '🔍 New search'; btn.disabled = false; }
+}
+
+async function runSearch() {
+  if (searchActive) return;
+  searchActive = true;
+
+  const kw        = document.getElementById('search-kw').value.trim();
+  const radiusStr = document.getElementById('search-radius').value;
+  const miles     = parseInt(radiusStr) || 10;
+  const session   = getSession();
+  const users     = getUsers();
+  const user      = session ? users[session.email] : null;
+
+  // Area: use the search box first, fall back to profile postcode
+  const areaInput = document.getElementById('search-area').value.trim();
+  const postcode  = areaInput || (user && user.postcode ? user.postcode : 'M1 1AE');
+
+  // Trade: use search selector first, fall back to profile trade
+  const tradeInput = document.getElementById('search-trade').value.trim();
+  const trade      = tradeInput || (user && user.trade ? user.trade : 'General contractor');
+
+  if (!postcode) {
+    alert('Please enter an area or postcode to search.');
+    searchActive = false;
+    return;
+  }
+
+  const container = document.getElementById('leads-container');
+  const btn = document.querySelector('#sec-leads .btn-primary');
+  if (btn) { btn.textContent = '⏳ Searching…'; btn.disabled = true; }
+
+  // Build live status UI
+  container.innerHTML = `
+    <div id="live-status-card" style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:24px 20px;">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
+        <div class="ai-dot" style="width:10px;height:10px;flex-shrink:0;border-radius:50%;background:var(--accent-light);"></div>
+        <div style="font-weight:500;font-size:15px;">TradeFlow is searching live…</div>
+      </div>
+      <div id="live-log" style="display:flex;flex-direction:column;gap:2px;"></div>
+    </div>`;
+  const log = document.getElementById('live-log');
+
+  const done = () => {
+    searchActive = false;
+    if (btn) { btn.textContent = '🔍 New search'; btn.disabled = false; }
+  };
+
+  try {
+    // ── STEP 1: Postcode lookup ──
+    const r1 = addLog(log, '📍', 'Looking up postcode ' + postcode + '…');
+    setStatus('Looking up postcode…');
+
+    let district = postcode;
+    try {
+      const pcRes = await fetch('https://api.postcodes.io/postcodes/' + encodeURIComponent(postcode));
+      const pcData = await pcRes.json();
+      if (pcData.status === 200) {
+        district = pcData.result.admin_district || postcode;
+        updateLog(r1, '✅', 'Found: ' + district);
+      } else {
+        updateLog(r1, '⚠️', 'Using postcode area: ' + postcode);
+      }
+    } catch(e) {
+      updateLog(r1, '⚠️', 'Using postcode area: ' + postcode);
+    }
+
+    // ── Call Railway backend server ──
+    let leads = [];
+    let usedServer = false;
+
+    const r2 = addLog(log, '🧠', 'Finding leads for a ' + trade + ' near ' + postcode + '…');
+    setStatus('Finding leads…');
+
+    try {
+      const serverRes = await fetch(
+        'https://trade-flow-production-6fd8.up.railway.app/leads?area=' + encodeURIComponent(postcode) +
+        '&radius=' + encodeURIComponent(radiusStr) +
+        '&trade=' + encodeURIComponent(trade) +
+        (kw ? '&keywords=' + encodeURIComponent(kw) : '')
+      );
+      if (serverRes.ok) {
+        const serverData = await serverRes.json();
+        leads = serverData.leads || [];
+        usedServer = true;
+        updateLog(r2, '✅', leads.length + ' leads found near ' + postcode + (serverData.real_data ? ' · real planning data 🟢' : ' · AI generated'));
+      } else {
+        const errData = await serverRes.json().catch(() => ({}));
+        throw new Error(errData.error || 'Server error ' + serverRes.status);
+      }
+    } catch(e) {
+      throw new Error('Could not reach server: ' + e.message);
+    }
+
+    if (!leads.length) {
+      if (document.getElementById('live-status-card')) document.getElementById('live-status-card').remove();
+      showSearchError(container, 'No leads found for a ' + trade + ' near ' + postcode + '. Try updating your trade in Settings.');
+      setStatus('No leads found');
+      done(); return;
+    }
+
+    updateLog(r2, '✅', leads.length + ' leads found for a ' + trade + ' near ' + postcode);
+    const r3 = addLog(log, '⚡', 'Loading results…');
+    await new Promise(r => setTimeout(r, 300));
+
+    // ── STEP 3: Reveal cards one by one ──
+    if (document.getElementById('live-status-card')) document.getElementById('live-status-card').remove();
+    container.innerHTML = '';
+
+    currentLeadPool = leads.map(l => ({
+      name: l.type || 'Renovation project',
+      summary: l.summary,
+      score: l.score,
+      location: l.address,
+      source: 'TradeFlow AI',
+      budget: l.budget || 'Not stated',
+      timeframe: l.timeframe,
+      contact: '',
+      ref: 'N/A'
+    }));
+    currentLeadPool.sort((a, b) => b.score - a.score);
+
+    for (let i = 0; i < currentLeadPool.length; i++) {
+      const lead = currentLeadPool[i];
+      const scoreClass = lead.score >= 75 ? 'score-high' : lead.score >= 50 ? 'score-med' : 'score-low';
+      const isSaved = savedLeads.some(s => s.location === lead.location);
+      const div = document.createElement('div');
+      div.className = 'lead-card';
+      div.style.cssText = 'opacity:0;transform:translateY(8px);transition:opacity 0.25s ease,transform 0.25s ease;';
+      div.innerHTML =
+        '<div class="lead-score ' + scoreClass + '">' + lead.score +
+          '<div style="font-size:9px;font-family:\'DM Sans\',sans-serif;font-weight:500;opacity:0.7">score</div>' +
+        '</div>' +
+        '<div class="lead-main">' +
+          '<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">' +
+            '<div class="lead-name">' + escHtml(lead.name) + '</div>' +
+            '<span class="tag tag-green" style="font-size:11px;">🟢 Live</span>' +
+          '</div>' +
+          '<div class="lead-desc">' + escHtml(lead.summary) + '</div>' +
+          '<div class="lead-meta" style="margin-top:8px;">' +
+            '<span class="tag tag-gray">📍 ' + escHtml(lead.location) + '</span>' +
+            '<span class="tag ' + (lead.timeframe === 'ASAP' || lead.timeframe.toLowerCase().includes('approv') ? 'tag-green' : 'tag-amber') + '">⏱ ' + escHtml(lead.timeframe) + '</span>' +
+            '<span class="tag tag-gray">💰 ' + escHtml(lead.budget) + '</span>' +
+          '</div>' +
+          '<div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--border);font-size:12px;color:var(--text-3);">' +
+            '📋 <strong style="color:var(--text-2)">Ref: ' + escHtml(lead.ref || 'N/A') + '</strong> · ' +
+            'Find full address then skip trace the owner' +
+          '</div>' +
+          '<div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap;">' +
+            '<a href="https://www.google.com/search?q=' + encodeURIComponent((lead.ref || '') + ' planning application address') + '" target="_blank" style="text-decoration:none;"><button class="btn" style="padding:5px 10px;font-size:12px;background:var(--accent-bg);color:var(--accent);border-color:var(--accent-bg2);">🔍 Find full address</button></a>' +
+            '<a href="https://www.192.com/atoz/people/?q=' + encodeURIComponent(lead.location) + '" target="_blank" style="text-decoration:none;"><button class="btn" style="padding:5px 10px;font-size:12px;">📞 Skip trace on 192.com</button></a>' +
+            '<a href="https://search2.landregistry.gov.uk/search/house-prices-paid#/?q=' + encodeURIComponent(lead.location) + '" target="_blank" style="text-decoration:none;"><button class="btn" style="padding:5px 10px;font-size:12px;">🏠 Land Registry</button></a>' +
+            '<a href="https://www.facebook.com/search/people/?q=' + encodeURIComponent(lead.location) + '" target="_blank" style="text-decoration:none;"><button class="btn" style="padding:5px 10px;font-size:12px;">👤 Facebook search</button></a>' +
+          '</div>' +
+        '</div>' +
+        '<div class="lead-actions">' +
+          '<button class="btn btn-primary" style="padding:7px 14px;font-size:13px;" data-letter-idx="' + i + '" onclick="copyLetter(this)">📋 Copy letter</button>' +
+          '<button class="btn save-btn" style="padding:7px 14px;font-size:13px;' + (isSaved ? 'background:var(--accent-bg);color:var(--accent)' : '') + '" data-save-idx="' + i + '" onclick="saveLeadByIdx(this)">' + (isSaved ? 'Saved ✓' : 'Save') + '</button>' +
+        '</div>';
+      container.appendChild(div);
+      await new Promise(r => setTimeout(r, 80));
+      div.style.opacity = '1';
+      div.style.transform = 'translateY(0)';
+    }
+
+    const scores = currentLeadPool.map(l => l.score);
+    document.getElementById('stat-week').textContent = currentLeadPool.length;
+    document.getElementById('stat-score').textContent = Math.round(scores.reduce((a,b)=>a+b,0)/scores.length);
+    const now = new Date();
+    document.getElementById('stat-time').textContent = now.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
+    document.getElementById('stat-time-sub').textContent = 'just now';
+    setStatus(currentLeadPool.length + ' leads near ' + postcode + ' · updated ' + now.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'}));
+
+  } catch(e) {
+    console.error(e);
+    if (document.getElementById('live-status-card')) document.getElementById('live-status-card').remove();
+    showSearchError(container, e.message || 'Something went wrong. Please try again.');
+    setStatus('Search failed — try again');
+  }
+
+  done();
+}
+
+
+let currentLeadPool = [];
+
+function renderLeads(leads, container) {
+  container.innerHTML = '';
+  leads.sort((a,b) => b.score - a.score);
+  currentLeadPool = leads;
+  leads.forEach((lead, i) => {
+    const scoreClass = lead.score >= 75 ? 'score-high' : lead.score >= 50 ? 'score-med' : 'score-low';
+    const isSaved = savedLeads.some(s => s.name === lead.name);
+    const div = document.createElement('div');
+    div.className = 'lead-card';
+    div.innerHTML = `
+      <div class="lead-score ${scoreClass}">${lead.score}<div style="font-size:9px;font-family:'DM Sans',sans-serif;font-weight:500;opacity:0.75">score</div></div>
+      <div class="lead-main">
+        <div class="lead-name">${escHtml(lead.name)}</div>
+        <div class="lead-desc">${escHtml(lead.summary)}</div>
+        <div class="lead-meta">
+          <span class="tag tag-gray">📍 ${escHtml(lead.location)}</span>
+          <span class="tag ${lead.timeframe==='ASAP'?'tag-green':'tag-amber'}">⏱ ${escHtml(lead.timeframe)}</span>
+          <span class="tag tag-gray">💰 ${escHtml(lead.budget)}</span>
+        </div>
+        <div class="lead-source" style="margin-top:8px">Source: ${escHtml(lead.source)} · Contact: ${escHtml(lead.contact)}</div>
+      </div>
+      <div class="lead-actions">
+        <button class="btn btn-primary" style="padding:7px 14px;font-size:13px" data-contact-idx="${i}" onclick="contactLeadByIdx(this)">Contact</button>
+        <button class="btn save-btn" style="padding:7px 14px;font-size:13px;${isSaved?'background:var(--accent-bg);color:var(--accent)':''}" data-save-idx="${i}" onclick="saveLeadByIdx(this)">${isSaved ? 'Saved ✓' : 'Save'}</button>
+      </div>`;
+    container.appendChild(div);
+  });
+}
+
+function saveLeadByIdx(btn) {
+  const idx = parseInt(btn.getAttribute('data-save-idx'));
+  const lead = currentLeadPool[idx];
+  if (!lead || savedLeads.some(s => s.name === lead.name)) return;
+  savedLeads.push(lead);
+  savedCount++;
+  btn.textContent = 'Saved ✓';
+  btn.style.background = 'var(--accent-bg)';
+  btn.style.color = 'var(--accent)';
+  document.getElementById('stat-saved').textContent = savedCount;
+  refreshSaved();
+}
+
+function contactLeadByIdx(btn) {
+  const idx = parseInt(btn.getAttribute('data-contact-idx'));
+  const lead = currentLeadPool[idx];
+  if (!lead) return;
+  if (lead.ref && lead.ref !== 'N/A') {
+    const url = 'https://www.planning.data.gov.uk/entity.json?dataset=planning-application&reference=' + encodeURIComponent(lead.ref);
+    window.open('https://www.planning.data.gov.uk/entity/?dataset=planning-application&reference=' + encodeURIComponent(lead.ref), '_blank');
+  } else {
+    alert('Address: ' + lead.location + '\n\nSearch this address on your local council planning portal to find contact details.');
+  }
+}
+
+function refreshSaved() {
+  const container = document.getElementById('saved-container');
+  if (savedLeads.length === 0) {
+    container.innerHTML = '<div style="text-align:center;padding:60px 20px;color:var(--text-3)"><div style="font-size:32px;margin-bottom:12px">📌</div><div style="font-size:15px;font-weight:500;color:var(--text-2);margin-bottom:6px">No saved leads yet</div><div style="font-size:13px">Save leads from your search results to track them here.</div></div>';
+    return;
+  }
+  const backup = currentLeadPool;
+  currentLeadPool = [...savedLeads];
+  container.innerHTML = '';
+  savedLeads.forEach((lead, i) => {
+    const scoreClass = lead.score >= 75 ? 'score-high' : lead.score >= 50 ? 'score-med' : 'score-low';
+    const div = document.createElement('div');
+    div.className = 'lead-card';
+    div.innerHTML =
+      '<div class="lead-score ' + scoreClass + '">' + lead.score + '<div style="font-size:9px;font-family:\'DM Sans\',sans-serif;font-weight:500;opacity:0.75">score</div></div>' +
+      '<div class="lead-main">' +
+        '<div class="lead-name">' + escHtml(lead.name) + '</div>' +
+        '<div class="lead-desc">' + escHtml(lead.summary) + '</div>' +
+        '<div class="lead-meta">' +
+          '<span class="tag tag-gray">📍 ' + escHtml(lead.location) + '</span>' +
+          '<span class="tag tag-amber">⏱ ' + escHtml(lead.timeframe) + '</span>' +
+          '<span class="tag tag-gray">💰 ' + escHtml(lead.budget) + '</span>' +
+        '</div>' +
+        '<div class="lead-source" style="margin-top:8px">📋 ' + escHtml(lead.source) + ' &nbsp;·&nbsp; Ref: ' + escHtml(lead.contact.replace('View on planning portal · Ref: ','')) + '</div>' +
+      '</div>' +
+      '<div class="lead-actions">' +
+        '<button class="btn btn-primary" style="padding:7px 14px;font-size:13px" data-contact-idx="' + i + '" onclick="contactLeadByIdx(this)">View →</button>' +
+        '<button class="btn" style="padding:7px 14px;font-size:13px;background:var(--accent-bg);color:var(--accent)" disabled>Saved ✓</button>' +
+      '</div>';
+    container.appendChild(div);
+  });
+  currentLeadPool = backup;
+}
+
+function getPlanningUrl(lead) {
+  const ref = lead.ref && lead.ref !== 'N/A' ? lead.ref : '';
+  if (ref) {
+    return 'https://www.google.com/search?q=' + encodeURIComponent(ref + ' planning application full address site details');
+  }
+  return 'https://www.planningportal.co.uk/applications#/?applicationType=0&page=1&query=' + encodeURIComponent(lead.location);
+}
+
+function copyLetter(btn) {
+  const lead = currentLeadPool[idx];
+  if (!lead) return;
+  const session = getSession();
+  const users   = getUsers();
+  const user    = session ? users[session.email] : null;
+  const name    = user ? user.name : 'a local tradesperson';
+  const trade   = user ? user.trade : 'contractor';
+  const letter  =
+    'Dear Homeowner,\n\n' +
+    'I noticed you have recently applied for planning permission for a ' + lead.name.toLowerCase() + ' at:\n' +
+    lead.location + '\n\n' +
+    'I am a local ' + trade + ' with experience in exactly this type of work and would love to offer you a FREE, no-obligation quote.\n\n' +
+    'Getting quotes early — before work begins — can save you thousands of pounds and ensure your project runs smoothly.\n\n' +
+    'Please feel free to call or text me at any time:\n\n' +
+    '📞 [Your phone number here]\n' +
+    '📧 [Your email here]\n\n' +
+    'I look forward to hearing from you.\n\n' +
+    'Kind regards,\n' + name + '\n[Your business name]\n[Your phone number]';
+
+  navigator.clipboard.writeText(letter).then(() => {
+    btn.textContent = '✅ Copied!';
+    setTimeout(() => { btn.textContent = '📋 Copy letter'; }, 2500);
+  }).catch(() => {
+    prompt('Copy this letter:', letter);
+  });
+}
+
+function escHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function escAtt(s) { return String(s).replace(/'/g,'&#39;').replace(/"/g,'&quot;'); }
+
+// ── Make functions globally accessible ──
+window.showAuth     = showAuth;
+window.doSignup     = doSignup;
+window.doLogin      = doLogin;
+window.demoLogin    = demoLogin;
+window.logout       = logout;
+window.setSection   = setSection;
+window.runSearch    = runSearch;
+window.runUKWideSearch = runUKWideSearch;
+window.quickSearch  = quickSearch;
+window.saveLeadByIdx   = saveLeadByIdx;
+window.contactLeadByIdx = contactLeadByIdx;
+window.copyLetter   = copyLetter;
+window.doPayment    = doPayment;
+
+// ── Wire up all buttons ──
+function wireButtons() {
+  function wire(id, fn) { var el = document.getElementById(id); if (el) el.addEventListener('click', fn); }
+  wire('nav-login-btn',      function() { showAuth('login'); });
+  wire('nav-signup-btn',     function() { showAuth('signup'); });
+  wire('hero-signup-btn',    function() { showAuth('signup'); });
+  wire('pricing-signup-btn', function() { showAuth('signup'); });
+  wire('hero-pricing-btn',   function() { document.getElementById('pricing').scrollIntoView({behavior:'smooth'}); });
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', wireButtons);
+} else {
+  wireButtons();
+}
+
+(function init() {
+  // Set initial states
+  var pages = {
+    'page-landing':   'display:flex;flex-direction:column;',
+    'page-auth':      'display:none;',
+    'page-payment':   'display:none;',
+    'page-dashboard': 'display:none;'
+  };
+  Object.keys(pages).forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el) el.style.cssText = pages[id];
+  });
+
+  var session = getSession();
+  if (session) {
+    var users = getUsers();
+    var user  = users[session.email];
+    if (user) { enterDashboard(user); return; }
+  }
+})();
+</script>
+</body>
+</html>
