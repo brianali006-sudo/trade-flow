@@ -6,64 +6,123 @@ const https   = require('https');
 const http    = require('http');
 
 const app  = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 8080;
 const ANTHROPIC_KEY = process.env.ANTHROPIC_API_KEY;
+const GROQ_KEY      = process.env.GROQ_API_KEY;
 
-if (!ANTHROPIC_KEY) {
-  console.error('ANTHROPIC_API_KEY missing. Add it in Railway Variables.');
+if (!ANTHROPIC_KEY && !GROQ_KEY) {
+  console.error('No API key found. Add ANTHROPIC_API_KEY or GROQ_API_KEY in Railway Variables.');
   process.exit(1);
 }
+
+console.log('AI provider: ' + (GROQ_KEY ? 'Groq (free)' : 'Anthropic'));
 
 app.use(cors());
 app.use(express.json());
 
-// Simple fetch using built-in https (no external fetch library needed)
-function fetchJSON(url, options = {}) {
+// ── HTTP helper ──
+function fetchURL(url, options = {}) {
   return new Promise((resolve, reject) => {
     const parsed = new URL(url);
-    const lib = parsed.protocol === 'https:' ? https : http;
-    const reqOptions = {
+    const lib    = parsed.protocol === 'https:' ? https : http;
+    const opts   = {
       hostname: parsed.hostname,
-      path: parsed.pathname + parsed.search,
-      method: options.method || 'GET',
-      headers: options.headers || {}
+      port:     parsed.port || (parsed.protocol === 'https:' ? 443 : 80),
+      path:     parsed.pathname + parsed.search,
+      method:   options.method || 'GET',
+      headers:  options.headers || {}
     };
-    const req = lib.request(reqOptions, (res) => {
-      let data = '';
-      res.on('data', chunk => data += chunk);
-      res.on('end', () => {
-        try { resolve({ ok: res.statusCode < 400, status: res.statusCode, json: () => JSON.parse(data) }); }
-        catch(e) { reject(e); }
-      });
+    const req = lib.request(opts, (res) => {
+      let raw = '';
+      res.on('data', c => raw += c);
+      res.on('end', () => resolve({ status: res.statusCode, body: raw }));
     });
     req.on('error', reject);
+    req.setTimeout(20000, () => { req.destroy(); reject(new Error('Request timed out')); });
     if (options.body) req.write(options.body);
     req.end();
   });
 }
 
-// Cache (2 hours)
+// ── Cache (2 hours) ──
 const cache = new Map();
-const CACHE_TTL = 2 * 60 * 60 * 1000;
 function getCached(key) {
   const e = cache.get(key);
-  if (!e || Date.now() - e.time > CACHE_TTL) { cache.delete(key); return null; }
+  if (!e || Date.now() - e.time > 7200000) { cache.delete(key); return null; }
   return e.data;
 }
 function setCache(key, data) { cache.set(key, { data, time: Date.now() }); }
 
-// Rate limit (10 per IP per hour)
+// ── Rate limit (10/hr per IP) ──
 const rateLimits = new Map();
 function checkRateLimit(ip) {
-  const now = Date.now(), window = 3600000, max = 10;
-  const times = (rateLimits.get(ip) || []).filter(t => now - t < window);
+  const now   = Date.now();
+  const times = (rateLimits.get(ip) || []).filter(t => now - t < 3600000);
   rateLimits.set(ip, times);
-  if (times.length >= max) return false;
+  if (times.length >= 10) return false;
   times.push(now);
   return true;
 }
 
-// GET /leads?area=Manchester&radius=10&trade=Plumber
+// ── Call AI (Groq first, fallback to Anthropic) ──
+async function callAI(prompt) {
+  // Try Groq first (free)
+  if (GROQ_KEY) {
+    try {
+      const body = JSON.stringify({
+        model: 'llama-3.1-8b-instant',
+        max_tokens: 1500,
+        messages: [{ role: 'user', content: prompt }]
+      });
+      const res = await fetchURL('https://api.groq.com/openai/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type':   'application/json',
+          'Authorization':  'Bearer ' + GROQ_KEY,
+          'Content-Length': Buffer.byteLength(body)
+        },
+        body
+      });
+      if (res.status === 200) {
+        const d = JSON.parse(res.body);
+        return d.choices[0].message.content;
+      }
+      console.log('[GROQ] error ' + res.status + ': ' + res.body.substring(0, 200));
+    } catch(e) {
+      console.log('[GROQ] failed:', e.message);
+    }
+  }
+
+  // Fallback to Anthropic
+  if (ANTHROPIC_KEY) {
+    const body = JSON.stringify({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: 1500,
+      messages: [{ role: 'user', content: prompt }]
+    });
+    const res = await fetchURL('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type':      'application/json',
+        'x-api-key':         ANTHROPIC_KEY,
+        'anthropic-version': '2023-06-01',
+        'Content-Length':    Buffer.byteLength(body)
+      },
+      body
+    });
+    if (res.status === 200) {
+      const d = JSON.parse(res.body);
+      return (d.content || []).map(b => b.text || '').join('');
+    }
+    throw new Error('Anthropic error ' + res.status + ': ' + res.body.substring(0, 200));
+  }
+
+  throw new Error('No AI provider available');
+}
+
+// ════════════════════════════════
+//  GET /leads
+// ════════════════════════════════
 app.get('/leads', async (req, res) => {
   const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
   const { area, radius = '10', trade = 'General contractor', keywords = '' } = req.query;
@@ -72,70 +131,87 @@ app.get('/leads', async (req, res) => {
   if (!checkRateLimit(ip)) return res.status(429).json({ error: 'Too many searches. Try again in an hour.' });
 
   const cacheKey = `${area}|${radius}|${trade}|${keywords}`.toLowerCase();
-  const cached = getCached(cacheKey);
-  if (cached) return res.json({ ...cached, cached: true });
+  const cached   = getCached(cacheKey);
+  if (cached) { console.log('[CACHE]', area); return res.json({ ...cached, cached: true }); }
 
   try {
     // Step 1 — resolve area to lat/lng
     let lat, lng, district = area;
 
-    const isPostcode = /^[A-Z]{1,2}\d/i.test(area);
+    const isPostcode = /^[A-Z]{1,2}\d/i.test(area.trim());
     if (isPostcode) {
-      const r = await fetchJSON(`https://api.postcodes.io/postcodes/${encodeURIComponent(area)}`);
-      const d = r.json();
-      if (d.status === 200) { lat = d.result.latitude; lng = d.result.longitude; district = d.result.admin_district; }
+      const r = await fetchURL(`https://api.postcodes.io/postcodes/${encodeURIComponent(area.trim())}`);
+      const d = JSON.parse(r.body);
+      if (d.status === 200) { lat = d.result.latitude; lng = d.result.longitude; district = d.result.admin_district || area; }
     }
     if (!lat) {
-      const r = await fetchJSON(`https://api.postcodes.io/places?q=${encodeURIComponent(area)}&limit=1`);
-      const d = r.json();
-      if (d.status === 200 && d.result?.[0]) { lat = d.result[0].latitude; lng = d.result[0].longitude; district = d.result[0].name_1 || area; }
+      const r = await fetchURL(`https://api.postcodes.io/places?q=${encodeURIComponent(area)}&limit=1`);
+      const d = JSON.parse(r.body);
+      if (d.status === 200 && d.result && d.result.length > 0) { lat = d.result[0].latitude; lng = d.result[0].longitude; district = d.result[0].name_1 || area; }
     }
-    if (!lat) return res.status(400).json({ error: `Location not found: "${area}". Try a UK postcode like M1 1AE or a city name like Manchester.` });
+    if (!lat) return res.status(400).json({ error: `Location not found: "${area}". Try a UK postcode like TF1 3GJ or a city like Manchester.` });
+
+    console.log(`[SEARCH] ${area} → ${district} (${lat}, ${lng}) | ${trade}`);
 
     // Step 2 — fetch real planning applications
     const deg = parseFloat(radius) / 69.0;
-    const planningUrl = `https://www.planning.data.gov.uk/entity.json?dataset=planning-application&entries=current&limit=50&field=reference&field=name&field=address&field=description&field=start-date&field=entry-date&longitude__gte=${(lng-deg).toFixed(6)}&longitude__lte=${(lng+deg).toFixed(6)}&latitude__gte=${(lat-deg).toFixed(6)}&latitude__lte=${(lat+deg).toFixed(6)}`;
+    const planningUrl =
+      `https://www.planning.data.gov.uk/entity.json?dataset=planning-application&entries=current&limit=50` +
+      `&field=reference&field=name&field=address&field=description&field=start-date` +
+      `&longitude__gte=${(lng-deg).toFixed(6)}&longitude__lte=${(lng+deg).toFixed(6)}` +
+      `&latitude__gte=${(lat-deg).toFixed(6)}&latitude__lte=${(lat+deg).toFixed(6)}`;
 
     let apps = [], realData = false;
     try {
-      const r = await fetchJSON(planningUrl);
-      const d = r.json();
-      apps = d.entities || [];
+      const r = await fetchURL(planningUrl);
+      const d = JSON.parse(r.body);
+      apps     = d.entities || [];
       realData = apps.length > 0;
-      console.log(`Planning API: ${apps.length} results near ${area}`);
-    } catch(e) { console.log('Planning API unavailable, using AI fallback'); }
+      console.log(`[PLANNING] ${apps.length} apps found near ${area}`);
+    } catch(e) { console.log('[PLANNING] unavailable:', e.message); }
 
-    // Step 3 — score with Claude
+    // Step 3 — AI scoring
     const prompt = realData
-      ? `You are a lead scoring AI for TradeFlow UK.\nTrade: ${trade}\nArea: ${district}\n${keywords?'Keywords: '+keywords+'\n':''}\nReal UK government planning applications:\n${apps.slice(0,25).map((a,i)=>`${i+1}. Ref:${a.reference||'N/A'} | ${a.address||a.name||'?'} | ${a.description||a.name||'Application'}`).join('\n')}\n\nScore relevant ones for a ${trade}. Skip commercial/irrelevant.\nReturn ONLY JSON array, no markdown:\n[{"ref":"...","address":"...","summary":"2 sentences why a ${trade} should contact","score":50-97,"type":"Rear extension|Loft conversion|New build|Renovation|Bathroom|Kitchen|Roof","timeframe":"Recently approved|Under consideration|ASAP","budget":"£2k-5k|£5k-15k|£15k-40k|£40k+|Not stated"}]`
-      : `You are a lead generation AI for TradeFlow UK.\nTrade: ${trade}\nArea: ${district} (${area})\n${keywords?'Keywords: '+keywords+'\n':''}\nGenerate 8 realistic residential construction leads for a ${trade} in ${district}. Use realistic UK street names for ${area}. Vary project types and budgets.\nReturn ONLY JSON array, no markdown:\n[{"ref":"N/A","address":"realistic UK address in ${area}","summary":"what work needed and why contact urgently","score":55-92,"type":"Rear extension|Loft conversion|New build|Renovation|Bathroom|Kitchen|Roof","timeframe":"ASAP|Recently approved|Under consideration|Within 3 months","budget":"£2k-5k|£5k-15k|£15k-40k|£40k+|Not stated"}]`;
+      ? `You are a lead scoring AI for TradeFlow UK.\nTrade: ${trade}\nArea: ${district}\n${keywords?'Keywords: '+keywords+'\n':''}\nReal UK government planning applications:\n${apps.slice(0,25).map((a,i)=>`${i+1}. Ref:${a.reference||'N/A'} | ${a.address||a.name||'?'} | ${a.description||a.name||'Application'}`).join('\n')}\n\nScore the relevant ones for a ${trade}. Skip commercial or irrelevant ones.\nReturn ONLY a raw JSON array, no markdown, no explanation:\n[{"ref":"...","address":"...","summary":"2 sentences why a ${trade} should contact this homeowner","score":55-97,"type":"Rear extension|Loft conversion|New build|Renovation|Bathroom|Kitchen|Roof","timeframe":"Recently approved|Under consideration|ASAP|Within 3 months","budget":"£2k-5k|£5k-15k|£15k-40k|£40k+|Not stated"}]`
+      : `You are a lead generation AI for TradeFlow UK.\nTrade: ${trade}\nArea: ${district} (${area})\n${keywords?'Keywords: '+keywords+'\n':''}\nGenerate 8 realistic residential construction leads for a ${trade} in ${district}. Use realistic UK street names for ${area}. Vary project types and budgets.\nReturn ONLY a raw JSON array, no markdown, no explanation:\n[{"ref":"N/A","address":"realistic full UK address in ${area}","summary":"what work is needed and why a ${trade} should contact urgently","score":55-92,"type":"Rear extension|Loft conversion|New build|Renovation|Bathroom|Kitchen|Roof","timeframe":"ASAP|Recently approved|Under consideration|Within 3 months","budget":"£2k-5k|£5k-15k|£15k-40k|£40k+|Not stated"}]`;
 
-    const aiRes = await fetchJSON('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'x-api-key': ANTHROPIC_KEY, 'anthropic-version': '2023-06-01' },
-      body: JSON.stringify({ model: 'claude-sonnet-4-20250514', max_tokens: 1500, messages: [{ role: 'user', content: prompt }] })
-    });
-
-    if (!aiRes.ok) throw new Error('AI error ' + aiRes.status);
-
-    const aiData = aiRes.json();
-    const raw = (aiData.content||[]).map(b=>b.text||'').join('');
+    const raw   = await callAI(prompt);
     const match = raw.match(/\[[\s\S]*\]/);
-    if (!match) throw new Error('AI returned no results');
+    if (!match) throw new Error('AI returned no structured results. Response: ' + raw.substring(0, 300));
 
     const leads = JSON.parse(match[0]);
-    const result = { area, district, source: realData ? 'UK Planning Portal (gov.uk)' : 'AI generated', real_data: realData, total: leads.length, leads, cached: false, timestamp: new Date().toISOString() };
+    console.log(`[DONE] ${leads.length} leads for ${trade} near ${area} | real_data: ${realData}`);
+
+    const result = {
+      area, district,
+      source:    realData ? 'UK Planning Portal (gov.uk)' : 'AI generated',
+      real_data: realData,
+      total:     leads.length,
+      leads,
+      cached:    false,
+      timestamp: new Date().toISOString()
+    };
 
     setCache(cacheKey, result);
-    console.log(`Done: ${leads.length} leads for ${trade} near ${area}`);
     res.json(result);
 
   } catch(err) {
-    console.error('Error:', err.message);
+    console.error('[ERROR]', err.message);
     res.status(500).json({ error: err.message });
   }
 });
 
-app.get('/', (req, res) => res.json({ status: 'TradeFlow API running ✅', test: '/leads?area=Manchester&trade=Plumber&radius=10' }));
+// ── Health check ──
+app.get('/', (req, res) => {
+  res.json({
+    status: 'TradeFlow API running ✅',
+    ai_provider: GROQ_KEY ? 'Groq (free)' : 'Anthropic',
+    test: '/leads?area=Manchester&trade=Plumber&radius=10'
+  });
+});
 
-app.listen(PORT, () => console.log(`\n✅ TradeFlow server running on port ${PORT}\n`));
+app.listen(PORT, () => {
+  console.log(`\n✅ TradeFlow server on port ${PORT}`);
+  console.log(`   AI: ${GROQ_KEY ? 'Groq (free)' : 'Anthropic'}`);
+  console.log(`   Test: http://localhost:${PORT}/leads?area=Manchester&trade=Plumber\n`);
+});
