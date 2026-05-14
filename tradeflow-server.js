@@ -165,8 +165,9 @@ app.get('/leads', async (req, res) => {
 
     const raw   = await callAI(prompt);
     console.log('[AI RAW]', raw.substring(0, 200));
-    const match = raw.match(/\[[\s\S]*\]/);
-    if (!match) throw new Error('AI returned no JSON. Raw: ' + raw.substring(0, 200));
+    const cleaned = raw.replace(/```json/g,'').replace(/```/g,'').trim();
+    const match = cleaned.match(/\[[\s\S]*\]/);
+    if (!match) throw new Error('AI returned no JSON. Raw: ' + cleaned.substring(0, 200));
 
     const leads = JSON.parse(match[0]);
     console.log('[DONE]', leads.length, 'leads for', trade, 'near', area);
