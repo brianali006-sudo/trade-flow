@@ -975,12 +975,12 @@ async function runUKWideSearch() {
           '<span class="tag ' + (lead.timeframe === 'ASAP' || lead.timeframe.toLowerCase().includes('approv') ? 'tag-green' : 'tag-amber') + '">⏱ ' + escHtml(lead.timeframe) + '</span>' +
           '<span class="tag tag-gray">💰 ' + escHtml(lead.budget) + '</span>' +
         '</div>' +
-        '<div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--border);font-size:12px;color:var(--text-3);">📋 <strong style="color:var(--text-2)">How to contact:</strong> Find full address then skip trace the owner</div>' +
+        '<div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--border);font-size:12px;color:var(--text-3);">📋 <strong style="color:var(--text-2)">How to contact:</strong> Click Find full address to get the exact street address from the council website</div>' +
         '<div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap;">' +
-          '<a href="https://www.google.com/search?q=' + encodeURIComponent((lead.ref || '') + ' planning application address') + '" target="_blank" style="text-decoration:none;"><button class="btn" style="padding:5px 10px;font-size:12px;background:var(--accent-bg);color:var(--accent);border-color:var(--accent-bg2);">🔍 Find full address</button></a>' +
-          '<a href="https://www.192.com/atoz/people/?q=' + encodeURIComponent(lead.location) + '" target="_blank" style="text-decoration:none;"><button class="btn" style="padding:5px 10px;font-size:12px;">📞 Skip trace on 192.com</button></a>' +
+          '<a href="https://www.google.com/search?q=' + encodeURIComponent('"' + (lead.ref || lead.location) + '" planning application site:*.gov.uk') + '" target="_blank" style="text-decoration:none;"><button class="btn" style="padding:5px 10px;font-size:12px;background:var(--accent-bg);color:var(--accent);border-color:var(--accent-bg2);">🔍 Find full address</button></a>' +
+          '<a href="https://www.192.com/atoz/people/?q=' + encodeURIComponent(lead.location) + '" target="_blank" style="text-decoration:none;"><button class="btn" style="padding:5px 10px;font-size:12px;">📞 Skip trace 192.com</button></a>' +
           '<a href="https://search2.landregistry.gov.uk/search/house-prices-paid#/?q=' + encodeURIComponent(lead.location) + '" target="_blank" style="text-decoration:none;"><button class="btn" style="padding:5px 10px;font-size:12px;">🏠 Land Registry</button></a>' +
-          '<a href="https://www.facebook.com/search/people/?q=' + encodeURIComponent(lead.location) + '" target="_blank" style="text-decoration:none;"><button class="btn" style="padding:5px 10px;font-size:12px;">👤 Facebook search</button></a>' +
+          '<a href="https://www.facebook.com/search/people/?q=' + encodeURIComponent(lead.location) + '" target="_blank" style="text-decoration:none;"><button class="btn" style="padding:5px 10px;font-size:12px;">👤 Facebook</button></a>' +
         '</div>' +
       '</div>' +
       '<div class="lead-actions">' +
@@ -1146,14 +1146,13 @@ async function runSearch() {
             '<span class="tag tag-gray">💰 ' + escHtml(lead.budget) + '</span>' +
           '</div>' +
           '<div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--border);font-size:12px;color:var(--text-3);">' +
-            '📋 <strong style="color:var(--text-2)">Ref: ' + escHtml(lead.ref || 'N/A') + '</strong> · ' +
-            'Find full address then skip trace the owner' +
+            '📋 <strong style="color:var(--text-2)">Ref: ' + escHtml(lead.ref || 'N/A') + '</strong> · Click <strong>Find full address</strong> to get the exact street address from your council website' +
           '</div>' +
           '<div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap;">' +
-            '<a href="https://www.google.com/search?q=' + encodeURIComponent((lead.ref || '') + ' planning application address') + '" target="_blank" style="text-decoration:none;"><button class="btn" style="padding:5px 10px;font-size:12px;background:var(--accent-bg);color:var(--accent);border-color:var(--accent-bg2);">🔍 Find full address</button></a>' +
-            '<a href="https://www.192.com/atoz/people/?q=' + encodeURIComponent(lead.location) + '" target="_blank" style="text-decoration:none;"><button class="btn" style="padding:5px 10px;font-size:12px;">📞 Skip trace on 192.com</button></a>' +
+            '<a href="https://www.google.com/search?q=' + encodeURIComponent('"' + (lead.ref || '') + '" planning application site:*.gov.uk') + '" target="_blank" style="text-decoration:none;"><button class="btn" style="padding:5px 10px;font-size:12px;background:var(--accent-bg);color:var(--accent);border-color:var(--accent-bg2);">🔍 Find full address</button></a>' +
+            '<a href="https://www.192.com/atoz/people/?q=' + encodeURIComponent(lead.location) + '" target="_blank" style="text-decoration:none;"><button class="btn" style="padding:5px 10px;font-size:12px;">📞 Skip trace 192.com</button></a>' +
             '<a href="https://search2.landregistry.gov.uk/search/house-prices-paid#/?q=' + encodeURIComponent(lead.location) + '" target="_blank" style="text-decoration:none;"><button class="btn" style="padding:5px 10px;font-size:12px;">🏠 Land Registry</button></a>' +
-            '<a href="https://www.facebook.com/search/people/?q=' + encodeURIComponent(lead.location) + '" target="_blank" style="text-decoration:none;"><button class="btn" style="padding:5px 10px;font-size:12px;">👤 Facebook search</button></a>' +
+            '<a href="https://www.facebook.com/search/people/?q=' + encodeURIComponent(lead.location) + '" target="_blank" style="text-decoration:none;"><button class="btn" style="padding:5px 10px;font-size:12px;">👤 Facebook</button></a>' +
           '</div>' +
         '</div>' +
         '<div class="lead-actions">' +
