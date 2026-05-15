@@ -831,15 +831,20 @@ async function doLogin() {
   }
 }
 
-function demoLogin() {
-  const users = getUsers();
+async function demoLogin() {
   const demoEmail = 'demo@tradeflow.ai';
-  if (!users[demoEmail]) {
-    users[demoEmail] = { name: 'Demo User', email: demoEmail, pass: 'demo1234', trade: 'General contractor', postcode: 'M1', trialEnd: Date.now() + 7*86400000 };
-    saveUsers(users);
+  try {
+    let results = await sbQuery('GET', 'users', null, { email: demoEmail });
+    if (!results || results.length === 0) {
+      await sbQuery('POST', 'users', { name: 'Demo User', email: demoEmail, password: 'demo1234', trade: 'General contractor', postcode: 'M1 1AE' });
+      results = await sbQuery('GET', 'users', null, { email: demoEmail });
+    }
+    const user = results[0];
+    saveSession({ email: user.email, name: user.name, trade: user.trade, postcode: user.postcode });
+    enterDashboard(user);
+  } catch(e) {
+    showAuthError('Demo login failed. Please try again.');
   }
-  saveSession({ email: demoEmail });
-  enterDashboard(users[demoEmail]);
 }
 
 function fmtCard(el) {
@@ -855,13 +860,7 @@ function fmtExpiry(el) {
 function doPayment() {
   const session = getSession();
   if (!session) return;
-  const users = getUsers();
-  const user = users[session.email];
-  const num = document.getElementById('card-num').value.replace(/\D/g,'');
-  if (num.length < 12) { alert('Please enter a valid card number.'); return; }
-  user.paid = true;
-  saveUsers(users);
-  enterDashboard(user);
+  enterDashboard({ name: session.name || 'User', email: session.email, trade: session.trade, postcode: session.postcode });
 }
 
 function enterDashboard(user) {
@@ -930,9 +929,7 @@ const UK_CITIES = [
 async function runUKWideSearch() {
   if (searchActive) return;
   const session = getSession();
-  const users   = getUsers();
-  const user    = session ? users[session.email] : null;
-  const trade   = document.getElementById('search-trade').value || (user && user.trade) || 'General contractor';
+  const trade   = document.getElementById('search-trade').value || (session && session.trade) || 'General contractor';
   const kw      = document.getElementById('search-kw').value.trim();
   const container = document.getElementById('leads-container');
   const btn     = document.querySelector('#sec-leads .btn-primary');
@@ -1046,16 +1043,14 @@ async function runSearch() {
   const radiusStr = document.getElementById('search-radius').value;
   const miles     = parseInt(radiusStr) || 10;
   const session   = getSession();
-  const users     = getUsers();
-  const user      = session ? users[session.email] : null;
 
   // Area: use the search box first, fall back to profile postcode
   const areaInput = document.getElementById('search-area').value.trim();
-  const postcode  = areaInput || (user && user.postcode ? user.postcode : 'M1 1AE');
+  const postcode  = areaInput || (session && session.postcode ? session.postcode : 'M1 1AE');
 
   // Trade: use search selector first, fall back to profile trade
   const tradeInput = document.getElementById('search-trade').value.trim();
-  const trade      = tradeInput || (user && user.trade ? user.trade : 'General contractor');
+  const trade      = tradeInput || (session && session.trade ? session.trade : 'General contractor');
 
   if (!postcode) {
     alert('Please enter an area or postcode to search.');
@@ -1320,10 +1315,8 @@ function copyLetter(btn) {
   const lead = currentLeadPool[idx];
   if (!lead) return;
   const session = getSession();
-  const users   = getUsers();
-  const user    = session ? users[session.email] : null;
-  const name    = user ? user.name : 'a local tradesperson';
-  const trade   = user ? user.trade : 'contractor';
+  const name    = session ? (session.name || 'a local tradesperson') : 'a local tradesperson';
+  const trade   = session ? (session.trade || 'contractor') : 'contractor';
   const letter  =
     'Dear Homeowner,\n\n' +
     'I noticed you have recently applied for planning permission for a ' + lead.name.toLowerCase() + ' at:\n' +
