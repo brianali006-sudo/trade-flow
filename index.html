@@ -732,11 +732,27 @@
 </div>
 
 <script>
-const USERS_KEY = 'tf_users';
-const SESSION_KEY = 'tf_session';
+// ── Supabase config ──
+const SUPABASE_URL = 'https://tjwupmvityufgtqakitu.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRqd3VwbXZpdHl1Zmd0cWFraXR1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg4NDQ2MzEsImV4cCI6MjA5NDQyMDYzMX0.ENXVcF9d2lEUmPksCmBtxOjimo1uddscOPvK98NcyCo';
 
-function getUsers() { return JSON.parse(localStorage.getItem(USERS_KEY) || '{}'); }
-function saveUsers(u) { localStorage.setItem(USERS_KEY, JSON.stringify(u)); }
+async function sbQuery(method, table, body, match) {
+  let url = SUPABASE_URL + '/rest/v1/' + table;
+  if (match) url += '?' + Object.entries(match).map(([k,v]) => k + '=eq.' + encodeURIComponent(v)).join('&');
+  const res = await fetch(url, {
+    method,
+    headers: {
+      'apikey': SUPABASE_KEY,
+      'Authorization': 'Bearer ' + SUPABASE_KEY,
+      'Content-Type': 'application/json',
+      'Prefer': method === 'POST' ? 'return=representation' : 'return=representation'
+    },
+    body: body ? JSON.stringify(body) : undefined
+  });
+  return res.json();
+}
+
+const SESSION_KEY = 'tf_session';
 function getSession() { return JSON.parse(localStorage.getItem(SESSION_KEY) || 'null'); }
 function saveSession(s) { localStorage.setItem(SESSION_KEY, JSON.stringify(s)); }
 function clearSession() { localStorage.removeItem(SESSION_KEY); }
@@ -774,30 +790,45 @@ function showAuthError(msg) {
   if (el) { el.textContent = msg; el.style.display = 'block'; }
 }
 
-function doSignup() {
-  const name = document.getElementById('su-name').value.trim();
-  const email = document.getElementById('su-email').value.trim();
-  const pass = document.getElementById('su-pass').value;
-  const trade = document.getElementById('su-trade').value;
+async function doSignup() {
+  const name     = document.getElementById('su-name').value.trim();
+  const email    = document.getElementById('su-email').value.trim();
+  const pass     = document.getElementById('su-pass').value;
+  const trade    = document.getElementById('su-trade').value;
   const postcode = document.getElementById('su-postcode').value.trim();
   if (!name || !email || !pass || !trade || !postcode) return showAuthError('Please fill in all fields.');
   if (pass.length < 8) return showAuthError('Password must be at least 8 characters.');
-  const users = getUsers();
-  if (users[email]) return showAuthError('An account with this email already exists.');
-  users[email] = { name, email, pass, trade, postcode, trialEnd: Date.now() + 7*86400000, paid: false };
-  saveUsers(users);
-  saveSession({ email });
-  // Redirect to Stripe payment
-  window.location.href = 'https://buy.stripe.com/dRmaEX8dI00ffZLbkG1VK00?prefilled_email=' + encodeURIComponent(email);
+
+  try {
+    // Check if email already exists
+    const existing = await sbQuery('GET', 'users', null, { email });
+    if (existing && existing.length > 0) return showAuthError('An account with this email already exists.');
+
+    // Create user
+    const result = await sbQuery('POST', 'users', { name, email, password: pass, trade, postcode });
+    if (!result || result.error) return showAuthError('Signup failed. Please try again.');
+
+    const user = result[0] || result;
+    saveSession({ email, name, trade, postcode });
+    window.location.href = 'https://buy.stripe.com/dRmaEX8dI00ffZLbkG1VK00?prefilled_email=' + encodeURIComponent(email);
+  } catch(e) {
+    showAuthError('Signup failed. Please try again.');
+  }
 }
 
-function doLogin() {
+async function doLogin() {
   const email = document.getElementById('li-email').value.trim();
-  const pass = document.getElementById('li-pass').value;
-  const users = getUsers();
-  if (!users[email] || users[email].pass !== pass) return showAuthError('Incorrect email or password.');
-  saveSession({ email });
-  enterDashboard(users[email]);
+  const pass  = document.getElementById('li-pass').value;
+  try {
+    const results = await sbQuery('GET', 'users', null, { email });
+    if (!results || results.length === 0) return showAuthError('Incorrect email or password.');
+    const user = results[0];
+    if (user.password !== pass) return showAuthError('Incorrect email or password.');
+    saveSession({ email: user.email, name: user.name, trade: user.trade, postcode: user.postcode });
+    enterDashboard(user);
+  } catch(e) {
+    showAuthError('Login failed. Please try again.');
+  }
 }
 
 function demoLogin() {
@@ -835,14 +866,17 @@ function doPayment() {
 
 function enterDashboard(user) {
   showPage('page-dashboard');
-  const initials = user.name.split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase();
+  const name = user.name || 'User';
+  const initials = name.split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase();
   document.getElementById('dash-avatar').textContent = initials;
-  document.getElementById('dash-username').textContent = user.name;
-  document.getElementById('pref-postcode').value = user.postcode || '';
-  const trialDays = Math.max(0, Math.ceil((user.trialEnd - Date.now()) / 86400000));
-  document.getElementById('billing-trial-note').textContent = trialDays > 0 ? `Free trial — ${trialDays} day${trialDays!==1?'s':''} remaining` : 'Paid subscription — active';
-  const renewal = new Date(Date.now() + 30*86400000);
-  document.getElementById('renewal-date').textContent = renewal.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});
+  document.getElementById('dash-username').textContent = name;
+  const postcodeEl = document.getElementById('pref-postcode');
+  if (postcodeEl) postcodeEl.value = user.postcode || '';
+  const createdAt = user.created_at ? new Date(user.created_at) : new Date();
+  const trialEnd  = new Date(createdAt.getTime() + 7*86400000);
+  const trialDays = Math.max(0, Math.ceil((trialEnd - Date.now()) / 86400000));
+  const trialEl = document.getElementById('billing-trial-note');
+  if (trialEl) trialEl.textContent = trialDays > 0 ? 'Free trial — ' + trialDays + ' day' + (trialDays!==1?'s':'') + ' remaining' : 'Paid subscription — active';
 }
 
 function logout() {
@@ -1344,8 +1378,7 @@ if (document.readyState === 'loading') {
   wireButtons();
 }
 
-(function init() {
-  // Set initial states
+(async function init() {
   var pages = {
     'page-landing':   'display:flex;flex-direction:column;',
     'page-auth':      'display:none;',
@@ -1358,10 +1391,16 @@ if (document.readyState === 'loading') {
   });
 
   var session = getSession();
-  if (session) {
-    var users = getUsers();
-    var user  = users[session.email];
-    if (user) { enterDashboard(user); return; }
+  if (session && session.email) {
+    try {
+      const results = await sbQuery('GET', 'users', null, { email: session.email });
+      if (results && results.length > 0) {
+        enterDashboard(results[0]);
+        return;
+      }
+    } catch(e) {
+      // Fall through to landing
+    }
   }
 })();
 </script>
